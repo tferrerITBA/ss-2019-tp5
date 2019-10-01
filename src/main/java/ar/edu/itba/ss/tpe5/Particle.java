@@ -12,24 +12,23 @@ public class Particle implements Cloneable {
 	
 	private int id;
 	private double radius;
-	private int color;
+	private double mass;
 	private Point2D.Double position;
 	private Point2D.Double velocity;
 	private Set<Particle> neighbors;
 	
-	public Particle(double radius, int color) {
+	public Particle(double radius) {
 		this.id = count++;
 		this.radius = radius;
-		this.color = color;
 		this.position = new Point2D.Double();
 		this.velocity = new Point2D.Double();
 		this.neighbors = new HashSet<>();
 	}
 	
-	private Particle(int id, double radius, int color, double x, double y, double vx, double vy) {
+	private Particle(int id, double radius, double mass, double x, double y, double vx, double vy) {
 		this.id = id;
 		this.radius = radius;
-		this.color = color;
+		this.mass = mass;
 		this.position = new Point2D.Double(x, y);
 		this.velocity = new Point2D.Double(vx, vy);
 		this.neighbors = new HashSet<>();
@@ -52,13 +51,13 @@ public class Particle implements Cloneable {
 	
 	@Override
 	public String toString() {
-		return "id: " + id + "; radius: " + radius + " ; color: " + color + " ; x: " + position.x
+		return "id: " + id + "; radius: " + radius + " ; mass: " + mass + " ; x: " + position.x
 				+ " ; y: " + position.y + " ; vx: " + velocity.x + " ; vy: " + velocity.y;
 	}
 	
 	@Override
 	public Particle clone() {
-		return new Particle(id, radius, color, position.getX(), position.getY(), velocity.getX(), velocity.getY());
+		return new Particle(id, radius, mass, position.getX(), position.getY(), velocity.getX(), velocity.getY());
 	}
 
 	public int getId() {
@@ -69,8 +68,8 @@ public class Particle implements Cloneable {
 		return radius;
 	}
 
-	public int getColor() {
-		return color;
+	public double getMass() {
+		return mass;
 	}
 
 	public Point2D.Double getPosition() {

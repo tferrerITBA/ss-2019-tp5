@@ -14,7 +14,8 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class Configuration {
-	
+
+	private static double timeStep;
 	private static String staticFileName = "static_config.txt";
 	private static String dynamicFileName = "dynamic_config.txt";
 	private static Integer particleCount;
@@ -59,6 +60,13 @@ public class Configuration {
 	    }
 	    m = selectedM;
 	    isOptimalM = (m == 0);
+
+		System.out.println("Enter Time Step:");
+		Double selectedTimeStep = null;
+		while(selectedTimeStep == null || selectedTimeStep <= 0) {
+			selectedTimeStep = stringToDouble(scanner.nextLine());
+		}
+		timeStep = selectedTimeStep;
 
 	    if(!isDensityTestMode()) {
 			System.out.println("Enter Particle Count:");
@@ -177,14 +185,14 @@ public class Configuration {
 		System.err.println(message);
 		System.exit(1);
 	}
-	
+
 	private static Particle validateParticle(String[] attributes) {
 		Double radius = null;
 		if(attributes.length != 1
 			|| (radius = stringToDouble(attributes[0])) == null || radius < 0) {
 				failWithMessage(attributes[0] + " is an invalid Particle.");
 			}
-		return new Particle(radius, 1);
+		return new Particle(radius);
 	}
 	
 	private static void setDynamicParticleAttributes(Particle particle, String[] attributes) {
@@ -366,5 +374,9 @@ public class Configuration {
 	
 	public static boolean isDensityTestMode() {
 		return mode == Mode.DENSITY_TEST;
+	}
+
+	public static double getTimeStep() {
+		return timeStep;
 	}
 }
