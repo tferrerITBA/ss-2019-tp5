@@ -66,8 +66,6 @@ public class Grid {
 		
 		/* Particles within the same grid section */
 		calculateParticleNeighborsWithGridSection(p, middleRowIndex, middleColumnIndex, grid.get(middleRowIndex).get(middleColumnIndex));
-		if(m == 1)
-			return;
 		
 		/* Particles with neighboring grid section's particles */
 		int leftColumnIndex = gridSection.getColumn() - 1;
@@ -161,7 +159,7 @@ public class Grid {
 		particles = newParticles;
 	}
 	
-	public double getGridSectionLength() {
+	public double getGridSectionBorderLength() {
 		return boxWidth / m;
 	}
 	

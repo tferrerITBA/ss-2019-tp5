@@ -118,19 +118,20 @@ public class Configuration {
 	}
 	
 	private static void setParticleProperties(final List<Particle> particles, final String[] attributes) {
-		final int propertyCount = 5;
+		final int propertyCount = 6;
+		Integer id = null;
 		Double radius = null;
 		Double x = null;
 		Double y = null;
 		Double vx = null;
 		Double vy = null;
-		if(attributes.length != propertyCount || (radius = stringToDouble(attributes[0])) == null
-			|| (x = stringToDouble(attributes[1])) == null || (y = stringToDouble(attributes[2])) == null 
-			|| (vx = stringToDouble(attributes[3])) == null || (vy = stringToDouble(attributes[4])) == null) {
-				failWithMessage(attributes[0] + ", " + attributes[1] + ", " + attributes[2] + ", " + attributes[3] + ", " 
-						+ attributes[4] + " are invalid attributes.");
+		if(attributes.length != propertyCount || (id = stringToInt(attributes[0])) == null || (radius = stringToDouble(attributes[1])) == null
+			|| (x = stringToDouble(attributes[2])) == null || (y = stringToDouble(attributes[3])) == null 
+			|| (vx = stringToDouble(attributes[4])) == null || (vy = stringToDouble(attributes[5])) == null) {
+				failWithMessage(attributes[0] + ", " + attributes[1] + ", " + attributes[2] + ", " + attributes[3] 
+						+ ", " + attributes[4] + ", " + attributes[5] + " are invalid attributes.");
 			}
-		particles.add(new Particle(radius, PARTICLE_MASS, x, y, vx, vy));
+		particles.add(new Particle(id, radius, PARTICLE_MASS, x, y, vx, vy));
 	}
 	
 	/* Time (0) */
@@ -143,7 +144,7 @@ public class Configuration {
             fw.write("0\n");
             
             Random r = new Random();
-            for(int i = 0; i < PARTICLE_GEN_STEP_LIMIT; i++) {
+            for(int i = 0; i < PARTICLE_GEN_STEP_LIMIT; i++) { // CAMBIAR A TIME LIMIT
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = 0;
                 double randomPositionY = 0;
@@ -154,10 +155,11 @@ public class Configuration {
                     randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
                 }
-
-                particles.add(new Particle(radius, PARTICLE_MASS, randomPositionX, randomPositionY, INIT_VEL, INIT_VEL));
-                fw.write(radius + " " + randomPositionX + " " + randomPositionY + " " + INIT_VEL + " " + INIT_VEL + "\n");
+                Particle p = new Particle(radius, PARTICLE_MASS, randomPositionX, randomPositionY, INIT_VEL, INIT_VEL);
+                particles.add(p);
+                fw.write(p.getId() + " " + radius + " " + randomPositionX + " " + randomPositionY + " " + INIT_VEL + " " + INIT_VEL + "\n");
             }
+            particleCount = particles.size();
         } catch (IOException e) {
             System.err.println("Failed to create input file.");
             e.printStackTrace();
@@ -188,7 +190,7 @@ public class Configuration {
 	}
 	
 	public static void writeOvitoOutputFile(int time, List<Particle> particles) {
-		File outputFile = new File("ovito_output.xyz");
+		File outputFile = new File(OUTPUT_FILE_NAME);
 		try(FileWriter fw = new FileWriter(outputFile, true)) {
 			fw.write(particleCount + "\n");
 			fw.write("Lattice=\"" + BOX_WIDTH + " 0.0 0.0 0.0 " + BOX_HEIGHT 
@@ -205,10 +207,9 @@ public class Configuration {
 	
 	private static void writeOvitoParticle(FileWriter fw, Particle particle) throws IOException {
 		fw.write(particle.getId() + " " + particle.getRadius() + " " + particle.getPosition().x + " "
-				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y + " ");
-		
-		double angle = particle.getVelocityAngle();
-		fw.write(((Math.cos(angle) + 1) / 2) + " " + ((Math.sin(angle) + 1) / 2) + " " + Math.tan((angle + Math.PI) / 8));
+				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y + "1 1 1");
+		//double angle = particle.getVelocityAngle();
+		//fw.write(((Math.cos(angle) + 1) / 2) + " " + ((Math.sin(angle) + 1) / 2) + " " + Math.tan((angle + Math.PI) / 8));
 		fw.write('\n');
 	}
 

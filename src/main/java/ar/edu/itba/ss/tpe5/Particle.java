@@ -25,7 +25,7 @@ public class Particle implements Cloneable {
 		this.neighbors = new HashSet<>();
 	}
 	
-	private Particle(int id, double radius, double mass, double x, double y, double vx, double vy) {
+	public Particle(int id, double radius, double mass, double x, double y, double vx, double vy) {
 		this.id = id;
 		this.radius = radius;
 		this.mass = mass;
@@ -106,6 +106,10 @@ public class Particle implements Cloneable {
 		if(p == null)
 			return;
 		neighbors.add(p);
+	}
+	
+	public boolean isNeighbor(Particle other) {
+		return neighbors.contains(other);
 	}
 
 }
