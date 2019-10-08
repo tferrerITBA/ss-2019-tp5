@@ -32,6 +32,7 @@ public class Configuration {
 	private static int particleCount;
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static int timeLimit;
+	private static final int INVALID_POSITION_LIMIT = 500;
 	
 	public static void requestParameters() {
 		Scanner scanner = new Scanner(System.in);
@@ -139,7 +140,8 @@ public class Configuration {
             fw.write("0\n");
             
             Random r = new Random();
-            for(int i = 0; i < PARTICLE_GEN_STEP_LIMIT; i++) { // CAMBIAR A TIME LIMIT
+            int invalidPositions = 0;
+            while(invalidPositions < INVALID_POSITION_LIMIT) {
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = 0;
                 double randomPositionY = 0;
@@ -149,6 +151,7 @@ public class Configuration {
                     randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
                     randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
+                    invalidPositions += (isValidPosition) ? 0 : 1;
                 }
                 Particle p = new Particle(radius, PARTICLE_MASS, randomPositionX, randomPositionY, INIT_VEL, INIT_VEL);
                 particles.add(p);
@@ -165,6 +168,9 @@ public class Configuration {
     		final double randomPositionY, final double radius) {
         if(particles.isEmpty())
             return true;
+        if(randomPositionX - radius < 0 || randomPositionX + radius > BOX_WIDTH
+			|| randomPositionY - radius < 0 || randomPositionY + radius > BOX_HEIGHT)
+        	return false;
         for(Particle p : particles) {
             if(Math.sqrt(Math.pow(p.getPosition().getX() - randomPositionX, 2) + Math.pow(p.getPosition().getY() - randomPositionY, 2))
                     < (p.getRadius() + radius))
