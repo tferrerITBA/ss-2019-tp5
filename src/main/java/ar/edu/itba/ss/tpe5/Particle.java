@@ -111,5 +111,21 @@ public class Particle implements Cloneable {
 	public boolean isNeighbor(Particle other) {
 		return neighbors.contains(other);
 	}
+	
+	public double getBorderToBorderDistance(final Particle other) {
+		double horizontalDistance = Math.abs(getPosition().x - other.getPosition().x);
+		double verticalDistance = Math.abs(getPosition().y - other.getPosition().y);
+		return Math.sqrt(Math.pow(horizontalDistance, 2) + Math.pow(verticalDistance, 2)) - getRadius() - other.getRadius();
+	}
+	
+	public double getCenterToCenterDistance(final Particle other) {
+		double horizontalDistance = Math.abs(getPosition().x - other.getPosition().x);
+		double verticalDistance = Math.abs(getPosition().y - other.getPosition().y);
+		return Math.sqrt(Math.pow(horizontalDistance, 2) + Math.pow(verticalDistance, 2));
+	}
+	
+	public Point2D.Double getRelativeVelocity(final Particle other) {
+		return new Point2D.Double(velocity.getX() - other.getVelocity().getX(), velocity.getY() - other.getVelocity().getY());
+	}
 
 }

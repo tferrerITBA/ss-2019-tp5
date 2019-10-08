@@ -15,13 +15,14 @@ public class Grid {
 	private final List<List<GridSection>> grid;
 	
 	public Grid(final List<Particle> particles) {
-		this.interactionRadius = Configuration.getInteractionRadius();
 		this.particles = particles;
 		this.boxWidth = Configuration.BOX_WIDTH;
 		this.boxHeight = Configuration.BOX_HEIGHT;
 		this.grid = new ArrayList<>();
 		
-		this.m = calculateMaximumGridSectionBorderCount();
+		double[] radiusPair = largestRadiusPair(particles);
+		this.interactionRadius = radiusPair[0] + radiusPair[1];
+		this.m = calculateMaximumGridSectionBorderCount(radiusPair);
 		
 		// Inferior grid sections can have smaller height; width fits perfectly
 		double gridSectionBorderLength = boxWidth / m;
@@ -32,7 +33,7 @@ public class Grid {
 				grid.get(i).add(new GridSection(i, j));
 			}
 		}
-		
+		System.out.println("ROWS: " + gridSectionRows + " COLUMNS: " + m);
 		updateGridSections();
 	}
 	
@@ -46,7 +47,7 @@ public class Grid {
 		}
 	}
 	
-	private void updateGridSections() {
+	public void updateGridSections() {
 		for(List<GridSection> gridRow : grid) {
 			for(GridSection gridSection : gridRow) {
 				gridSection.getParticles().clear();
@@ -107,9 +108,8 @@ public class Grid {
 		}
 	}
 
-	private int calculateMaximumGridSectionBorderCount() {
-		double[] r = largestRadiusPair(particles);
-		int maxM = (int) (boxWidth / (interactionRadius + r[0] + r[1]));
+	private int calculateMaximumGridSectionBorderCount(final double[] radiusPair) {
+		int maxM = (int) (boxWidth / (interactionRadius + radiusPair[0] + radiusPair[1]));
 		return (maxM == 0)? 1 : maxM;
 	}
 	

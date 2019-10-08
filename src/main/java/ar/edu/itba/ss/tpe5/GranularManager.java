@@ -1,10 +1,35 @@
 package ar.edu.itba.ss.tpe5;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import ar.edu.itba.ss.tpe5.Configuration;
+import ar.edu.itba.ss.tpe5.Particle;
 
 public class GranularManager {
-    private static Grid grid;
+	
+    private final Grid grid;
+    private final double timeStep;
+    
+    public GranularManager(final Grid grid) {
+    	this.grid = grid;
+    	this.timeStep = Configuration.getTimeStep();
+    }
+    
+    public void execute() {
+		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
+		double accumulatedTime = 0.0;
+		System.out.println("TIME STEP " + timeStep);
+		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
+			System.out.println("ENTRA AL CICLO");
+			Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
+			accumulatedTime += timeStep;
+			verletUpdate(previousParticles);
+			grid.updateGridSections();
+			grid.calculateAllParticlesNeighbors();
+		}
+	}
 
     public void verletUpdate(List<Particle> previousParticles) {
         List<Particle> currentParticles = grid.getParticles();
@@ -12,33 +37,83 @@ public class GranularManager {
         for(int i = 0; i < currentParticles.size(); i++) {
             Particle currParticle = currentParticles.get(i);
             Particle prevParticle = previousParticles.get(i);
-
+            
+            Point2D.Double acceleration = getAcceleration(currParticle);
+            System.out.println("ACCELERATION " + acceleration);
             double newPositionX = 2 * currParticle.getPosition().getX() - prevParticle.getPosition().getX()
-                    + Math.pow(Configuration.getTimeStep(), 2) * getAcceleration(currParticle); //+error
-            double newVelocityX = (newPositionX - prevParticle.getPosition().getX()) / (2 * Configuration.getTimeStep()); // + error
+                    + Math.pow(timeStep, 2) * acceleration.getX();
+            double newVelocityX = (newPositionX - prevParticle.getPosition().getX()) / (2 * timeStep);
+            
+            double newPositionY = 2 * currParticle.getPosition().getY() - prevParticle.getPosition().getY()
+                    + Math.pow(timeStep, 2) * acceleration.getY();
+            double newVelocityY = (newPositionY - prevParticle.getPosition().getY()) / (2 * timeStep);
 
-            prevParticle.setPosition(currParticle.getPosition().getX(), 0);
-            prevParticle.setVelocity(currParticle.getVelocity().getX(), 0);
-            currParticle.setPosition(newPositionX, 0);
-            currParticle.setVelocity(newVelocityX, 0);
+            prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
+            prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
+            currParticle.setPosition(newPositionX, newPositionY);
+            currParticle.setVelocity(newVelocityX, newVelocityY);
         }
     }
 
-    private double getAcceleration(final Particle p) {
-        return getParticleForce(p) / p.getMass();
+    private Point2D.Double getAcceleration(final Particle p) {
+    	Point2D.Double force = getParticleForce(p);
+        return new Point2D.Double(force.getX() / p.getMass(), force.getY() / p.getMass());
     }
 
-    private double getAcceleration(final double position, final double velocity, final double mass) {
-        return getParticleForce(position, velocity) / mass;
+//    private double getAcceleration(final double position, final double velocity, final double mass) {
+//        return getParticleForce(position, velocity) / mass;
+//    }
+
+    private Point2D.Double getParticleForce(final Particle p) {
+    	double resultantForceX = 0;
+    	double resultantForceY = 0;
+        for(Particle n : p.getNeighbors()) {
+        	double normalUnitVectorX = (n.getPosition().getX() - p.getPosition().getX()) / Math.abs(n.getRadius() - p.getRadius());
+        	double normalUnitVectorY = (n.getPosition().getY() - p.getPosition().getY()) / Math.abs(n.getRadius() - p.getRadius());
+        	Point2D.Double normalUnitVector = new Point2D.Double(normalUnitVectorX, normalUnitVectorY);
+        	Point2D.Double tangentUnitVector = new Point2D.Double(- normalUnitVectorY, normalUnitVectorX);
+        	
+        	double overlap = p.getRadius() + n.getRadius() - p.getCenterToCenterDistance(n);
+        	if(overlap < 0)
+        		overlap = 0; // ARREGLAR
+        	Point2D.Double relativeVelocity = p.getRelativeVelocity(n);
+        	
+        	double normalForce = - Configuration.K_NORM * overlap;
+        	double tangentForce = - Configuration.K_TANG * overlap * (relativeVelocity.getX() * tangentUnitVector.getX()
+        			+ relativeVelocity.getY() * tangentUnitVector.getY());
+        	
+        	resultantForceX += normalForce * normalUnitVector.getX() + tangentForce * (- normalUnitVector.getY());
+        	resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
+        }
+        return new Point2D.Double(resultantForceX, resultantForceY);
     }
 
-    private double getParticleForce(final Particle p) {
-        return - /*Configuration.OSCILLATOR_K*/1 * p.getPosition().getX() - /*Configuration.OSCILLATOR_GAMMA*/1 * p.getVelocity().getX();
-    }
-
-    private double getParticleForce(final double position, final double velocity) {
-        return - /*Configuration.OSCILLATOR_K*/1 * position - /*Configuration.OSCILLATOR_GAMMA*/1 * velocity;
-    }
+//    private double getParticleForce(final double position, final double velocity) {
+//        return - /*Configuration.OSCILLATOR_K*/1 * position - /*Configuration.OSCILLATOR_GAMMA*/1 * velocity;
+//    }
+    
+    // Euler Algorithm evaluated in (- timeStep)
+    private List<Particle> initPreviousParticles(final List<Particle> currentParticles) {
+    	List<Particle> previousParticles = new ArrayList<>();
+		for(Particle p : currentParticles) {
+			Particle prevParticle = p.clone();
+			Point2D.Double force = getParticleForce(p);
+			
+			double prevPositionX = p.getPosition().getX() - timeStep * p.getVelocity().getX()
+					+ Math.pow(timeStep, 2) * force.getX() / (2 * p.getMass());
+			double prevPositionY = p.getPosition().getY() - timeStep * p.getVelocity().getY()
+					+ Math.pow(timeStep, 2) * force.getY() / (2 * p.getMass());
+			
+			double prevVelocityX = p.getVelocity().getX() - (timeStep / p.getMass()) * force.getX();
+			double prevVelocityY = p.getVelocity().getY() - (timeStep / p.getMass()) * force.getY();
+			
+			prevParticle.setPosition(prevPositionX, prevPositionY);
+			prevParticle.setVelocity(prevVelocityX, prevVelocityY);
+			previousParticles.add(prevParticle);
+		}
+		
+		return previousParticles;
+	}
     
 //	public void executeOffLatice() {
 //	for(int i = 0; i < Configuration.getTimeLimit(); i++) {

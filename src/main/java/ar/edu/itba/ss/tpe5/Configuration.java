@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -23,23 +24,17 @@ public class Configuration {
 	private static final double MIN_PARTICLE_RADIUS = 0.01; // m
 	private static final double MAX_PARTICLE_RADIUS = 0.015; // m
 	private static final int PARTICLE_GEN_STEP_LIMIT = 100;
-	private static final double K_NORM = 1e5;
-	//private static final double K_TANG = 2 * K_NORM;
-	private static final double GAMMA = 70.0; // kg/s
+	public static final double K_NORM = 1e5;
+	public static final double K_TANG = 2 * K_NORM;
+//	private static final double GAMMA = 70.0; // kg/s
 	private static final double PARTICLE_MASS = 0.01; // kg
 	private static final double INIT_VEL = 0.0; // m/s
 	private static int particleCount;
-	private static Double interactionRadius;
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static int timeLimit;
 	
 	public static void requestParameters() {
 		Scanner scanner = new Scanner(System.in);
-		
-	    System.out.println("Enter Interaction Radius: ");
-	    while(interactionRadius == null || interactionRadius <= 0) {
-	    	interactionRadius = stringToDouble(scanner.nextLine());
-	    }
 
 //		System.out.println("Enter Time Step:");
 //		Double selectedTimeStep = null;
@@ -189,13 +184,13 @@ public class Configuration {
 		}
 	}
 	
-	public static void writeOvitoOutputFile(int time, List<Particle> particles) {
+	public static void writeOvitoOutputFile(double time, List<Particle> particles) {
 		File outputFile = new File(OUTPUT_FILE_NAME);
 		try(FileWriter fw = new FileWriter(outputFile, true)) {
 			fw.write(particleCount + "\n");
 			fw.write("Lattice=\"" + BOX_WIDTH + " 0.0 0.0 0.0 " + BOX_HEIGHT 
 				+ " 0.0 0.0 0.0 " + 0 
-				+ "\" Properties=id:I:1:radius:R:1:pos:R:2:velo:R:2:color:R:3 Time=" + time + ".0\n");
+				+ "\" Properties=id:I:1:radius:R:1:pos:R:2:velo:R:2 Time=" + String.format(Locale.US, "%.2g", time) + "\n");
 			for(Particle p : particles) {
 				writeOvitoParticle(fw, p);
 			}
@@ -219,10 +214,6 @@ public class Configuration {
 
 	public static void setParticleCount(int particleCount) {
 		Configuration.particleCount = particleCount;
-	}
-	
-	public static double getInteractionRadius() {
-		return interactionRadius;
 	}
 	
 	public static int getTimeLimit() {
