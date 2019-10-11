@@ -31,8 +31,9 @@ public class Configuration {
 	private static final double INIT_VEL = 0.0; // m/s
 	private static int particleCount;
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
-	private static int timeLimit;
+	private static double timeLimit;
 	private static final int INVALID_POSITION_LIMIT = 500;
+    public static final double GRAVITY = -9.8; // m/s^2
 	
 	public static void requestParameters() {
 		Scanner scanner = new Scanner(System.in);
@@ -45,9 +46,9 @@ public class Configuration {
 //		timeStep = selectedTimeStep;
 	    
 	    System.out.println("Enter Time Limit:");
-    	Integer selectedTimeLimit = null;
+    	Double selectedTimeLimit = null;
 	    while(selectedTimeLimit == null || selectedTimeLimit <= 0) {
-	    	selectedTimeLimit = stringToInt(scanner.nextLine());
+	    	selectedTimeLimit = stringToDouble(scanner.nextLine());
 	    }
 	    timeLimit = selectedTimeLimit;
 	    
@@ -208,7 +209,7 @@ public class Configuration {
 	
 	private static void writeOvitoParticle(FileWriter fw, Particle particle) throws IOException {
 		fw.write(particle.getId() + " " + particle.getRadius() + " " + particle.getPosition().x + " "
-				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y + "1 1 1");
+				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y);
 		//double angle = particle.getVelocityAngle();
 		//fw.write(((Math.cos(angle) + 1) / 2) + " " + ((Math.sin(angle) + 1) / 2) + " " + Math.tan((angle + Math.PI) / 8));
 		fw.write('\n');
@@ -222,7 +223,7 @@ public class Configuration {
 		Configuration.particleCount = particleCount;
 	}
 	
-	public static int getTimeLimit() {
+	public static double getTimeLimit() {
 		return timeLimit;
 	}
 

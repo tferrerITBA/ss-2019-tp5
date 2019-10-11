@@ -21,13 +21,15 @@ public class GranularManager {
 		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
 		double accumulatedTime = 0.0;
 		System.out.println("TIME STEP " + timeStep);
+		int i = 0;
 		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
-			System.out.println("ENTRA AL CICLO");
-			Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
+			if(i % 1000 == 0)
+				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
 			accumulatedTime += timeStep;
 			verletUpdate(previousParticles);
 			grid.updateGridSections();
 			grid.calculateAllParticlesNeighbors();
+			i++;
 		}
 	}
 
@@ -39,7 +41,7 @@ public class GranularManager {
             Particle prevParticle = previousParticles.get(i);
             
             Point2D.Double acceleration = getAcceleration(currParticle);
-            System.out.println("ACCELERATION " + acceleration);
+            
             double newPositionX = 2 * currParticle.getPosition().getX() - prevParticle.getPosition().getX()
                     + Math.pow(timeStep, 2) * acceleration.getX();
             double newVelocityX = (newPositionX - prevParticle.getPosition().getX()) / (2 * timeStep);
@@ -47,11 +49,18 @@ public class GranularManager {
             double newPositionY = 2 * currParticle.getPosition().getY() - prevParticle.getPosition().getY()
                     + Math.pow(timeStep, 2) * acceleration.getY();
             double newVelocityY = (newPositionY - prevParticle.getPosition().getY()) / (2 * timeStep);
-
-            prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
-            prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
-            currParticle.setPosition(newPositionX, newPositionY);
-            currParticle.setVelocity(newVelocityX, newVelocityY);
+            
+            if(newPositionY < 0) {
+            	prevParticle.setPosition(0, 0);
+                prevParticle.setVelocity(0, 0);
+            	currParticle.setPosition(0, 0);
+                currParticle.setVelocity(0, 0);
+            } else {
+            	prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
+                prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
+                currParticle.setPosition(newPositionX, newPositionY);
+                currParticle.setVelocity(newVelocityX, newVelocityY);
+            }
         }
     }
 
@@ -77,7 +86,8 @@ public class GranularManager {
         	if(overlap < 0)
         		overlap = 0; // ARREGLAR
         	Point2D.Double relativeVelocity = p.getRelativeVelocity(n);
-        	
+        	if(overlap > 0)
+        		System.out.println("OVERLAP");
         	double normalForce = - Configuration.K_NORM * overlap;
         	double tangentForce = - Configuration.K_TANG * overlap * (relativeVelocity.getX() * tangentUnitVector.getX()
         			+ relativeVelocity.getY() * tangentUnitVector.getY());
@@ -85,6 +95,7 @@ public class GranularManager {
         	resultantForceX += normalForce * normalUnitVector.getX() + tangentForce * (- normalUnitVector.getY());
         	resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
         }
+        resultantForceY += p.getMass() * Configuration.GRAVITY;
         return new Point2D.Double(resultantForceX, resultantForceY);
     }
 
