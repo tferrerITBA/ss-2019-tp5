@@ -3,6 +3,7 @@ package ar.edu.itba.ss.tpe5;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ar.edu.itba.ss.tpe5.Configuration;
 import ar.edu.itba.ss.tpe5.Particle;
@@ -21,6 +22,7 @@ public class GranularManager {
 		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
 		double accumulatedTime = 0.0;
 		System.out.println("TIME STEP " + timeStep);
+		grid.calculateAllParticlesNeighbors();
 		int i = 0;
 		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
 			if(i % 100 == 0)
@@ -34,7 +36,8 @@ public class GranularManager {
 	}
 
     public void verletUpdate(List<Particle> previousParticles) {
-        List<Particle> currentParticles = grid.getParticles();
+        List<Particle> currentParticles = grid.getParticles().stream().map(p -> p.clone()).collect(Collectors.toList());
+        
 
         for(int i = 0; i < currentParticles.size(); i++) {
             Particle currParticle = currentParticles.get(i);
@@ -66,6 +69,8 @@ public class GranularManager {
                 	System.out.println(currParticle.getId() + " X " + newPositionX + " ACC " + acceleration + " VEL " + newVelocityX);
             }
         }
+        
+        grid.setParticles(currentParticles);
     }
 
     private Point2D.Double getAcceleration(final Particle p) {
@@ -120,7 +125,7 @@ public class GranularManager {
 				}
 
         resultantForceY += Configuration.K_NORM * horizBorderOverlap;
-        resultantForceX += Configuration.K_TANG * horizBorderOverlap * p.getVelocity().getX();
+        //resultantForceX += Configuration.K_TANG * horizBorderOverlap * p.getVelocity().getX();
         
         double vertBorderOverlap = 0;
         if(p.getPosition().getX() - p.getRadius() < 0) {

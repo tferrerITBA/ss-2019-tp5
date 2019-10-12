@@ -32,7 +32,7 @@ public class Configuration {
 	private static int particleCount;
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static double timeLimit;
-	private static final int INVALID_POSITION_LIMIT = 500;
+	private static final int INVALID_POSITION_LIMIT = 100;
     public static final double GRAVITY = -9.8; // m/s^2
 	
 	public static void requestParameters() {

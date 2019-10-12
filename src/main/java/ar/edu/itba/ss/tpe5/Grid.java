@@ -57,9 +57,13 @@ public class Grid {
 		for(Particle p : particles) {
 			int particleGridSectionRow = (int) ((boxHeight + Configuration.MIN_PARTICLE_HEIGHT - p.getPosition().y) / gridSectionBorderLength);
 			if(particleGridSectionRow < 0)
-				System.out.println(p.getPosition().getY() + " " + gridSectionBorderLength);
+				System.out.println("ERROR ROW " + p.getId() + " " + p.getPosition().getY() + " " + gridSectionBorderLength);
 			int particleGridSectionColumn = (int) (p.getPosition().x / gridSectionBorderLength);
 			List<GridSection> columns = grid.get(particleGridSectionRow);
+			if(particleGridSectionColumn < 0)
+				System.out.println("ERROR COL " + p.getId() + " " + p.getPosition() + " " + gridSectionBorderLength);
+			if(particleGridSectionColumn >= columns.size())
+				System.out.println("ERROR COL " + p.getId() + " " + p.getPosition() + " " + gridSectionBorderLength);
 			columns.get(particleGridSectionColumn).addParticle(p);
 		}
 	}
