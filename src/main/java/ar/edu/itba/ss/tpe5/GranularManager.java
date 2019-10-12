@@ -22,8 +22,7 @@ public class GranularManager {
 		int i = 0;
 		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
 			grid.calculateAllParticlesNeighbors();
-			if(i % 100 == 0)
-				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
+			if (i % 100 == 0) Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
 			accumulatedTime += timeStep;
 			List<Particle> updatedParticles = new ArrayList<>(previousParticles.size());
 			verletUpdate(previousParticles, updatedParticles);
@@ -84,20 +83,27 @@ public class GranularManager {
     }
 
     private void repositionParticles(final Particle[] repParticles, final List<Particle> updatedParticles) {
-		double randomPositionX = 0;
-		double newPositionY = Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT - repParticles[0].getRadius();
-		Random r = new Random();
-		boolean isValidPosition = false;
-		while(!isValidPosition) {
-			randomPositionX = (Configuration.BOX_WIDTH - 2 * repParticles[0].getRadius()) * r.nextDouble() + repParticles[0].getRadius();
-			isValidPosition = Configuration.validateParticlePosition(updatedParticles, randomPositionX, newPositionY, repParticles[0].getRadius());
+			double randomPositionX = 0;
+			double randomPositionY = Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT - repParticles[0].getRadius();
+			Random r = new Random();
+			boolean isValidPosition = false;
+			double limit = 100;
+			double accumLimit = 0;
+			while(!isValidPosition) {
+				if (accumLimit == limit) {
+					randomPositionY -= repParticles[0].getRadius();
+					accumLimit = 0;
+				}
+				randomPositionX = (Configuration.BOX_WIDTH - 2 * repParticles[0].getRadius()) * r.nextDouble() + repParticles[0].getRadius();
+				isValidPosition = Configuration.validateParticlePosition(updatedParticles, randomPositionX, randomPositionY, repParticles[0].getRadius());
+				accumLimit++;
+			}
+			// System.out.println("REPOS " + repParticles[0].getId() + " " + randomPositionX + " " + newPositionY);
+			repParticles[0].setPosition(randomPositionX, randomPositionY);
+			repParticles[0].setVelocity(0, 0);
+			repParticles[1].setPosition(randomPositionX, randomPositionY);
+			repParticles[1].setVelocity(0, 0);
 		}
-		System.out.println("REPOS " + repParticles[0].getId() + " " + randomPositionX + " " + newPositionY);
-		repParticles[0].setPosition(randomPositionX, newPositionY);
-		repParticles[0].setVelocity(0, 0);
-		repParticles[1].setPosition(randomPositionX, newPositionY);
-		repParticles[1].setVelocity(0, 0);
-	}
 
 	private Point2D.Double getAcceleration(final Particle p) {
     	Point2D.Double force = getParticleForce(p);
@@ -163,10 +169,9 @@ public class GranularManager {
         	resultantForceX += - Configuration.K_NORM * vertBorderOverlap;
         }
 				
-        //resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
-
+        // resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
 				
-				if (vertBorderOverlap > 0) System.out.println(vertBorderOverlap);
+				// if (vertBorderOverlap > 0) System.out.println(vertBorderOverlap);
 
         
         resultantForceY += p.getMass() * Configuration.GRAVITY;
