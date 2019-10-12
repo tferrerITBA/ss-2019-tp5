@@ -107,7 +107,7 @@ public class GranularManager {
         } /*else if(p.getPosition().getY() + p.getRadius() > Configuration.BOX_HEIGHT) {
         	horizBorderOverlap = p.getRadius() - Math.abs(Configuration.BOX_HEIGHT - p.getPosition().getY());
         }*/
-        resultantForceY += - Configuration.K_NORM * horizBorderOverlap;
+        resultantForceY += Configuration.K_NORM * horizBorderOverlap;
         
         double vertBorderOverlap = 0;
         if(p.getPosition().getX() - p.getRadius() < 0) {
