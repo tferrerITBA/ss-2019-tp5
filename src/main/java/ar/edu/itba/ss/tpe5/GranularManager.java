@@ -3,10 +3,6 @@ package ar.edu.itba.ss.tpe5;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import ar.edu.itba.ss.tpe5.Configuration;
-import ar.edu.itba.ss.tpe5.Particle;
 
 public class GranularManager {
 	
@@ -29,7 +25,7 @@ public class GranularManager {
 				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
 			accumulatedTime += timeStep;
 			List<Particle> updatedParticles = new ArrayList<>(previousParticles.size());
-			previousParticles = verletUpdate(previousParticles, updatedParticles);
+			verletUpdate(previousParticles, updatedParticles);
 
 			grid.setParticles(updatedParticles);
 			grid.updateGridSections();
@@ -37,7 +33,7 @@ public class GranularManager {
 		}
 	}
 
-    public List<Particle> verletUpdate(List<Particle> previousParticles, List<Particle> updatedParticles) {
+    public void verletUpdate(List<Particle> previousParticles, List<Particle> updatedParticles) {
         List<Particle> currentParticles = grid.getParticles();//.stream().map(p -> p.clone()).collect(Collectors.toList());
         
 
@@ -57,15 +53,15 @@ public class GranularManager {
             double newVelocityY = (newPositionY - prevParticle.getPosition().getY()) / (2 * timeStep);
             
             if(newPositionY < 0) {
-            	//prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
-                //prevParticle.setVelocity(0, 0);
+            	prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+                prevParticle.setVelocity(0, 0);
                 updatedParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
             	//currParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
 				updatedParticle.setVelocity(0, 0);
                 //currParticle.setVelocity(0, 0);
             } else {
-            	//prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
-                //prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
+            	prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
+                prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
                 updatedParticle.setPosition(newPositionX, newPositionY);
                 //currParticle.setPosition(newPositionX, newPositionY);
 				updatedParticle.setVelocity(newVelocityX, newVelocityY);
@@ -79,7 +75,6 @@ public class GranularManager {
         }
         
         //grid.setParticles(currentParticles);
-		return currentParticles;
     }
 
     private Point2D.Double getAcceleration(final Particle p) {
@@ -141,9 +136,10 @@ public class GranularManager {
         	vertBorderOverlap = (p.getRadius() - Math.abs(p.getPosition().getX()));
         } else if(p.getPosition().getX() + p.getRadius() > Configuration.BOX_WIDTH) {
         	vertBorderOverlap = p.getRadius() - Math.abs(p.getPosition().getX() - Configuration.BOX_WIDTH);
+        	System.out.println("VERT OVERLAP " + vertBorderOverlap + " " + p.getPosition());
         }
 				resultantForceX += Configuration.K_NORM * vertBorderOverlap;
-        resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
+        //resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
 
 				
 				if (vertBorderOverlap > 0) System.out.println(vertBorderOverlap);
