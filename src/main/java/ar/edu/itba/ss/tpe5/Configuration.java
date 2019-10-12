@@ -144,15 +144,15 @@ public class Configuration {
             int invalidPositions = 0;
             //while(invalidPositions < INVALID_POSITION_LIMIT) {
             int i = 0;
-            while(i < 1) {
+            while(i < 2) {
             	i++;
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = BOX_WIDTH * 0.1;
                 double randomPositionY = BOX_HEIGHT * 0.9;
-                boolean isValidPosition = true;
+                boolean isValidPosition = false;
 
                 while(!isValidPosition) {
-                    randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
+                    // randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
                     randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius + MIN_PARTICLE_HEIGHT;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
                     invalidPositions += (isValidPosition) ? 0 : 1;

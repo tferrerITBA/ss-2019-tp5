@@ -93,9 +93,9 @@ public class GranularManager {
         			+ relativeVelocity.getY() * tangentUnitVector.getY());
         	
         	resultantForceX += normalForce * normalUnitVector.getX() + tangentForce * (- normalUnitVector.getY());
-        	resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
-        }
-        
+					resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
+				}
+				
         // Check for border overlap
         double horizBorderOverlap = 0;
         double boxHoleStartingX = (Configuration.BOX_WIDTH - Configuration.HOLE_WIDTH) / 2;
@@ -105,20 +105,18 @@ public class GranularManager {
         	horizBorderOverlap = (p.getRadius() - Math.abs(p.getPosition().getY() - Configuration.MIN_PARTICLE_HEIGHT));
 				}
 
-				if (horizBorderOverlap != 0 ) {
-					System.out.println("OVERLAP: " +  horizBorderOverlap + " FUERZA: " + Configuration.K_NORM * horizBorderOverlap);
-				}
-				
-
         resultantForceY += Configuration.K_NORM * horizBorderOverlap;
+        resultantForceX += Configuration.K_TANG * horizBorderOverlap * p.getVelocity().getX();
         
         double vertBorderOverlap = 0;
         if(p.getPosition().getX() - p.getRadius() < 0) {
-        	vertBorderOverlap = -(p.getRadius() - Math.abs(p.getPosition().getX()));
+        	vertBorderOverlap = (p.getRadius() - Math.abs(p.getPosition().getX()));
         } else if(p.getPosition().getX() + p.getRadius() > Configuration.BOX_WIDTH) {
         	vertBorderOverlap = p.getRadius() - Math.abs(p.getPosition().getX() - Configuration.BOX_WIDTH);
         }
-				resultantForceX += - Configuration.K_NORM * vertBorderOverlap;
+				resultantForceX += Configuration.K_NORM * vertBorderOverlap;
+        resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
+
 				
 				if (vertBorderOverlap > 0) System.out.println(vertBorderOverlap);
 
