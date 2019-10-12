@@ -30,7 +30,7 @@ public class Configuration {
 	private static final double PARTICLE_MASS = 0.01; // kg
 	private static final double INIT_VEL = 0.0; // m/s
 	private static int particleCount;
-	private static double timeStep = Math.sqrt(PARTICLE_MASS / K_NORM);
+	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static double timeLimit;
 	private static final int INVALID_POSITION_LIMIT = 500;
     public static final double GRAVITY = -9.8; // m/s^2
@@ -142,17 +142,17 @@ public class Configuration {
             
             Random r = new Random();
             int invalidPositions = 0;
-            //while(invalidPositions < INVALID_POSITION_LIMIT) {
-            int i = 0;
-            while(i < 1) {
-            	i++;
+            while(invalidPositions < INVALID_POSITION_LIMIT) {
+            //int i = 0;
+            //while(i < ) {
+            	//i++;
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = BOX_WIDTH * 0.1;
                 double randomPositionY = BOX_HEIGHT * 0.9;
                 boolean isValidPosition = false;
 
                 while(!isValidPosition) {
-                    // randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
+                    randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
                     randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius + MIN_PARTICLE_HEIGHT;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
                     invalidPositions += (isValidPosition) ? 0 : 1;

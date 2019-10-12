@@ -83,13 +83,16 @@ public class GranularManager {
         for(Particle n : p.getNeighbors()) {
         	double normalUnitVectorX = (n.getPosition().getX() - p.getPosition().getX()) / Math.abs(n.getRadius() - p.getRadius());
         	double normalUnitVectorY = (n.getPosition().getY() - p.getPosition().getY()) / Math.abs(n.getRadius() - p.getRadius());
+        	double norm = Math.sqrt(Math.pow(normalUnitVectorX, 2) + Math.pow(normalUnitVectorY, 2));
+        	normalUnitVectorX /= norm;
+        	normalUnitVectorY /= norm;
         	Point2D.Double normalUnitVector = new Point2D.Double(normalUnitVectorX, normalUnitVectorY);
         	Point2D.Double tangentUnitVector = new Point2D.Double(- normalUnitVectorY, normalUnitVectorX);
         	
         	double overlap = p.getRadius() + n.getRadius() - p.getCenterToCenterDistance(n);
         	if(overlap < 0)
 						overlap = 0; // ARREGLAR
-					if (overlap > 0) System.out.println(overlap);
+					//if (overlap > 0) System.out.println(overlap);
         	Point2D.Double relativeVelocity = p.getRelativeVelocity(n);
         	
         	double normalForce = - Configuration.K_NORM * overlap;
@@ -98,7 +101,14 @@ public class GranularManager {
         	
         	resultantForceX += normalForce * normalUnitVector.getX() + tangentForce * (- normalUnitVector.getY());
 					resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
-				}
+					
+					//System.out.println("FUERZA X ENTRE PARTS " + resultantForceX);
+//					if(resultantForceY > 0) {
+//						System.out.println("FUERZA Y ENTRE PARTS " + resultantForceY + " N " + normalForce + " T " + tangentForce + " Unit " + normalUnitVector);
+//						System.out.println(n.getPosition().getY() + " " + p.getPosition().getY() + " " + n.getRadius() + " " + p.getRadius());
+//        
+//					}
+        }
 				
         // Check for border overlap
         double horizBorderOverlap = 0;
