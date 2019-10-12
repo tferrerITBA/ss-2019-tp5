@@ -144,7 +144,7 @@ public class Configuration {
             int invalidPositions = 0;
             //while(invalidPositions < INVALID_POSITION_LIMIT) {
             int i = 0;
-            while(i < 2) {
+            while(i < 1) {
             	i++;
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = BOX_WIDTH * 0.1;

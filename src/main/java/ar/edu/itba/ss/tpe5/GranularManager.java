@@ -60,6 +60,10 @@ public class GranularManager {
                 prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
                 currParticle.setPosition(newPositionX, newPositionY);
                 currParticle.setVelocity(newVelocityX, newVelocityY);
+                if(newPositionY > 1.1)
+                	System.out.println(currParticle.getId() + " Y " + newPositionY + " ACC " + acceleration + " VEL " + newVelocityY);
+                if(newPositionX > 1)
+                	System.out.println(currParticle.getId() + " X " + newPositionX + " ACC " + acceleration + " VEL " + newVelocityX);
             }
         }
     }
