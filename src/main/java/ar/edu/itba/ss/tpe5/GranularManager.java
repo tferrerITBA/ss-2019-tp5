@@ -22,26 +22,29 @@ public class GranularManager {
 		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
 		double accumulatedTime = 0.0;
 		System.out.println("TIME STEP " + timeStep);
-		grid.calculateAllParticlesNeighbors();
 		int i = 0;
 		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
+			grid.calculateAllParticlesNeighbors();
 			if(i % 100 == 0)
 				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
 			accumulatedTime += timeStep;
-			verletUpdate(previousParticles);
+			List<Particle> updatedParticles = new ArrayList<>(previousParticles.size());
+			previousParticles = verletUpdate(previousParticles, updatedParticles);
+
+			grid.setParticles(updatedParticles);
 			grid.updateGridSections();
-			grid.calculateAllParticlesNeighbors();
 			i++;
 		}
 	}
 
-    public void verletUpdate(List<Particle> previousParticles) {
-        List<Particle> currentParticles = grid.getParticles().stream().map(p -> p.clone()).collect(Collectors.toList());
+    public List<Particle> verletUpdate(List<Particle> previousParticles, List<Particle> updatedParticles) {
+        List<Particle> currentParticles = grid.getParticles();//.stream().map(p -> p.clone()).collect(Collectors.toList());
         
 
         for(int i = 0; i < currentParticles.size(); i++) {
             Particle currParticle = currentParticles.get(i);
             Particle prevParticle = previousParticles.get(i);
+            Particle updatedParticle = currParticle.clone();
             
             Point2D.Double acceleration = getAcceleration(currParticle);
             
@@ -54,23 +57,29 @@ public class GranularManager {
             double newVelocityY = (newPositionY - prevParticle.getPosition().getY()) / (2 * timeStep);
             
             if(newPositionY < 0) {
-            	prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
-                prevParticle.setVelocity(0, 0);
-            	currParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
-                currParticle.setVelocity(0, 0);
+            	//prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+                //prevParticle.setVelocity(0, 0);
+                updatedParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+            	//currParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+				updatedParticle.setVelocity(0, 0);
+                //currParticle.setVelocity(0, 0);
             } else {
-            	prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
-                prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
-                currParticle.setPosition(newPositionX, newPositionY);
-                currParticle.setVelocity(newVelocityX, newVelocityY);
+            	//prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
+                //prevParticle.setVelocity(currParticle.getVelocity().getX(), currParticle.getVelocity().getY());
+                updatedParticle.setPosition(newPositionX, newPositionY);
+                //currParticle.setPosition(newPositionX, newPositionY);
+				updatedParticle.setVelocity(newVelocityX, newVelocityY);
+                //currParticle.setVelocity(newVelocityX, newVelocityY);
                 if(newPositionY > 1.1)
                 	System.out.println(currParticle.getId() + " Y " + newPositionY + " ACC " + acceleration + " VEL " + newVelocityY);
                 if(newPositionX > 1)
                 	System.out.println(currParticle.getId() + " X " + newPositionX + " ACC " + acceleration + " VEL " + newVelocityX);
             }
+            updatedParticles.add(updatedParticle);
         }
         
-        grid.setParticles(currentParticles);
+        //grid.setParticles(currentParticles);
+		return currentParticles;
     }
 
     private Point2D.Double getAcceleration(final Particle p) {
