@@ -4,6 +4,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.org.apache.xml.internal.security.encryption.CipherReference;
+
 import ar.edu.itba.ss.tpe5.Configuration;
 import ar.edu.itba.ss.tpe5.Particle;
 
@@ -51,9 +53,9 @@ public class GranularManager {
             double newVelocityY = (newPositionY - prevParticle.getPosition().getY()) / (2 * timeStep);
             
             if(newPositionY < 0) {
-            	prevParticle.setPosition(0, 0);
+            	prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
                 prevParticle.setVelocity(0, 0);
-            	currParticle.setPosition(0, 0);
+            	currParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
                 currParticle.setVelocity(0, 0);
             } else {
             	prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
@@ -86,8 +88,7 @@ public class GranularManager {
         	if(overlap < 0)
         		overlap = 0; // ARREGLAR
         	Point2D.Double relativeVelocity = p.getRelativeVelocity(n);
-        	if(overlap > 0)
-        		System.out.println("OVERLAP");
+        	
         	double normalForce = - Configuration.K_NORM * overlap;
         	double tangentForce = - Configuration.K_TANG * overlap * (relativeVelocity.getX() * tangentUnitVector.getX()
         			+ relativeVelocity.getY() * tangentUnitVector.getY());
@@ -95,6 +96,27 @@ public class GranularManager {
         	resultantForceX += normalForce * normalUnitVector.getX() + tangentForce * (- normalUnitVector.getY());
         	resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
         }
+        
+        // Check for border overlap
+        double horizBorderOverlap = 0;
+        double boxHoleStartingX = (Configuration.BOX_WIDTH - Configuration.HOLE_WIDTH) / 2;
+        double boxHoleEndingX = boxHoleStartingX + Configuration.HOLE_WIDTH;
+        if(Math.abs(p.getPosition().getY() - Configuration.MIN_PARTICLE_HEIGHT) < p.getRadius()
+        		&& (p.getPosition().getX() < boxHoleStartingX || p.getPosition().getX() > boxHoleEndingX)) {
+        	horizBorderOverlap = -(p.getRadius() - Math.abs(p.getPosition().getY()));
+        } /*else if(p.getPosition().getY() + p.getRadius() > Configuration.BOX_HEIGHT) {
+        	horizBorderOverlap = p.getRadius() - Math.abs(Configuration.BOX_HEIGHT - p.getPosition().getY());
+        }*/
+        resultantForceY += - Configuration.K_NORM * horizBorderOverlap;
+        
+        double vertBorderOverlap = 0;
+        if(p.getPosition().getX() - p.getRadius() < 0) {
+        	vertBorderOverlap = -(p.getRadius() - Math.abs(p.getPosition().getX()));
+        } else if(p.getPosition().getX() + p.getRadius() > Configuration.BOX_WIDTH) {
+        	vertBorderOverlap = p.getRadius() - Math.abs(p.getPosition().getX() - Configuration.BOX_WIDTH);
+        }
+        resultantForceX += - Configuration.K_NORM * vertBorderOverlap;
+        
         resultantForceY += p.getMass() * Configuration.GRAVITY;
         return new Point2D.Double(resultantForceX, resultantForceY);
     }

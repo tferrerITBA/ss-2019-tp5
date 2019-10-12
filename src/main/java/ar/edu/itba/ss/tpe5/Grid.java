@@ -26,7 +26,7 @@ public class Grid {
 		
 		// Inferior grid sections can have smaller height; width fits perfectly
 		double gridSectionBorderLength = boxWidth / m;
-		int gridSectionRows = (int) Math.round(Math.ceil(boxHeight / gridSectionBorderLength));
+		int gridSectionRows = (int) Math.round(Math.ceil((boxHeight + Configuration.MIN_PARTICLE_HEIGHT) / gridSectionBorderLength));
 		for(int i = 0; i < gridSectionRows; i++) {
 			grid.add(new ArrayList<>());
 			for(int j = 0; j < m; j++) {
@@ -55,9 +55,12 @@ public class Grid {
 		}
 		double gridSectionBorderLength = boxWidth / m;
 		for(Particle p : particles) {
-			int particleGridSectionRow = (int) ((boxHeight - p.getPosition().y) / gridSectionBorderLength);
+			int particleGridSectionRow = (int) ((boxHeight + Configuration.MIN_PARTICLE_HEIGHT - p.getPosition().y) / gridSectionBorderLength);
+			if(particleGridSectionRow < 0)
+				System.out.println(p.getPosition().getY() + " " + gridSectionBorderLength);
 			int particleGridSectionColumn = (int) (p.getPosition().x / gridSectionBorderLength);
-			grid.get(particleGridSectionRow).get(particleGridSectionColumn).addParticle(p);
+			List<GridSection> columns = grid.get(particleGridSectionRow);
+			columns.get(particleGridSectionColumn).addParticle(p);
 		}
 	}
 	

@@ -17,10 +17,10 @@ public class Configuration {
 
 	private static final String INPUT_FILE_NAME = "config.txt";
 	private static final String OUTPUT_FILE_NAME = "ovito_output.xyz";
-	public static final double BOX_WIDTH = 0.4; // m
-	public static final double BOX_HEIGHT = 1.5; // m
+	public static final double BOX_WIDTH = 1; // m
+	public static final double BOX_HEIGHT = 1; // m
 	public static final double HOLE_WIDTH = 0.25; // m
-	private static final double MIN_PARTICLE_HEIGHT = BOX_HEIGHT / 10; // m
+	public static final double MIN_PARTICLE_HEIGHT = BOX_HEIGHT / 10; // m
 	private static final double MIN_PARTICLE_RADIUS = 0.01; // m
 	private static final double MAX_PARTICLE_RADIUS = 0.015; // m
 	private static final int PARTICLE_GEN_STEP_LIMIT = 100;
@@ -30,7 +30,7 @@ public class Configuration {
 	private static final double PARTICLE_MASS = 0.01; // kg
 	private static final double INIT_VEL = 0.0; // m/s
 	private static int particleCount;
-	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
+	private static double timeStep = 0.01 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static double timeLimit;
 	private static final int INVALID_POSITION_LIMIT = 500;
     public static final double GRAVITY = -9.8; // m/s^2
@@ -142,7 +142,10 @@ public class Configuration {
             
             Random r = new Random();
             int invalidPositions = 0;
-            while(invalidPositions < INVALID_POSITION_LIMIT) {
+            //while(invalidPositions < INVALID_POSITION_LIMIT) {
+            int i = 0;
+            while(i < 2) {
+            	i++;
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = 0;
                 double randomPositionY = 0;
@@ -150,7 +153,7 @@ public class Configuration {
 
                 while(!isValidPosition) {
                     randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
-                    randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius;
+                    randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius + MIN_PARTICLE_HEIGHT;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
                     invalidPositions += (isValidPosition) ? 0 : 1;
                 }
@@ -170,7 +173,7 @@ public class Configuration {
         if(particles.isEmpty())
             return true;
         if(randomPositionX - radius < 0 || randomPositionX + radius > BOX_WIDTH
-			|| randomPositionY - radius < 0 || randomPositionY + radius > BOX_HEIGHT)
+			|| randomPositionY - radius - MIN_PARTICLE_HEIGHT < 0 || randomPositionY + radius > BOX_HEIGHT + MIN_PARTICLE_HEIGHT)
         	return false;
         for(Particle p : particles) {
             if(Math.sqrt(Math.pow(p.getPosition().getX() - randomPositionX, 2) + Math.pow(p.getPosition().getY() - randomPositionY, 2))
@@ -196,7 +199,7 @@ public class Configuration {
 		try(FileWriter fw = new FileWriter(outputFile, true)) {
 			fw.write(particleCount + "\n");
 			fw.write("Lattice=\"" + BOX_WIDTH + " 0.0 0.0 0.0 " + BOX_HEIGHT 
-				+ " 0.0 0.0 0.0 " + 0 
+				+ " 0.0 0.0 0.0 1.0"
 				+ "\" Properties=id:I:1:radius:R:1:pos:R:2:velo:R:2 Time=" + String.format(Locale.US, "%.2g", time) + "\n");
 			for(Particle p : particles) {
 				writeOvitoParticle(fw, p);
