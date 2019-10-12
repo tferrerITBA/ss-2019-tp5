@@ -3,6 +3,7 @@ package ar.edu.itba.ss.tpe5;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class GranularManager {
 	
@@ -35,7 +36,7 @@ public class GranularManager {
 
     public void verletUpdate(List<Particle> previousParticles, List<Particle> updatedParticles) {
         List<Particle> currentParticles = grid.getParticles();//.stream().map(p -> p.clone()).collect(Collectors.toList());
-        
+        List<Particle[]> repositionParticles = new ArrayList<>();
 
         for(int i = 0; i < currentParticles.size(); i++) {
             Particle currParticle = currentParticles.get(i);
@@ -53,11 +54,14 @@ public class GranularManager {
             double newVelocityY = (newPositionY - prevParticle.getPosition().getY()) / (2 * timeStep);
             
             if(newPositionY < 0) {
-            	prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
-                prevParticle.setVelocity(0, 0);
-                updatedParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
-            	//currParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
-				updatedParticle.setVelocity(0, 0);
+            	repositionParticles.add(new Particle[] {prevParticle, updatedParticle});
+//            	Random r = new Random();
+//            	Point2D.Double newPosition = getRandomTopPosition(currParticle, );
+//            	prevParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+//                prevParticle.setVelocity(0, 0);
+//                updatedParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+//            	//currParticle.setPosition(currParticle.getPosition().getX(), Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT);
+//				updatedParticle.setVelocity(0, 0);
                 //currParticle.setVelocity(0, 0);
             } else {
             	prevParticle.setPosition(currParticle.getPosition().getX(), currParticle.getPosition().getY());
@@ -73,11 +77,29 @@ public class GranularManager {
             }
             updatedParticles.add(updatedParticle);
         }
-        
+        for(Particle[] repParticles : repositionParticles) {
+        	repositionParticles(repParticles, updatedParticles);
+        }
         //grid.setParticles(currentParticles);
     }
 
-    private Point2D.Double getAcceleration(final Particle p) {
+    private void repositionParticles(final Particle[] repParticles, final List<Particle> updatedParticles) {
+		double randomPositionX = 0;
+		double newPositionY = Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT - repParticles[0].getRadius();
+		Random r = new Random();
+		boolean isValidPosition = false;
+		while(!isValidPosition) {
+			randomPositionX = (Configuration.BOX_WIDTH - 2 * repParticles[0].getRadius()) * r.nextDouble() + repParticles[0].getRadius();
+			isValidPosition = Configuration.validateParticlePosition(updatedParticles, randomPositionX, newPositionY, repParticles[0].getRadius());
+		}
+		System.out.println("REPOS " + repParticles[0].getId() + " " + randomPositionX + " " + newPositionY);
+		repParticles[0].setPosition(randomPositionX, newPositionY);
+		repParticles[0].setVelocity(0, 0);
+		repParticles[1].setPosition(randomPositionX, newPositionY);
+		repParticles[1].setVelocity(0, 0);
+	}
+
+	private Point2D.Double getAcceleration(final Particle p) {
     	Point2D.Double force = getParticleForce(p);
         return new Point2D.Double(force.getX() / p.getMass(), force.getY() / p.getMass());
     }
@@ -134,11 +156,13 @@ public class GranularManager {
         double vertBorderOverlap = 0;
         if(p.getPosition().getX() - p.getRadius() < 0) {
         	vertBorderOverlap = (p.getRadius() - Math.abs(p.getPosition().getX()));
+        	resultantForceX += Configuration.K_NORM * vertBorderOverlap;
         } else if(p.getPosition().getX() + p.getRadius() > Configuration.BOX_WIDTH) {
         	vertBorderOverlap = p.getRadius() - Math.abs(p.getPosition().getX() - Configuration.BOX_WIDTH);
-        	System.out.println("VERT OVERLAP " + vertBorderOverlap + " " + p.getPosition());
+        	//System.out.println("VERT OVERLAP " + vertBorderOverlap + " " + p.getPosition());
+        	resultantForceX += - Configuration.K_NORM * vertBorderOverlap;
         }
-				resultantForceX += Configuration.K_NORM * vertBorderOverlap;
+				
         //resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
 
 				

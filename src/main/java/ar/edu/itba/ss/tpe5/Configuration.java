@@ -32,7 +32,7 @@ public class Configuration {
 	private static int particleCount;
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static double timeLimit;
-	private static final int INVALID_POSITION_LIMIT = 100;
+	private static final int INVALID_POSITION_LIMIT = 500;
     public static final double GRAVITY = -9.8; // m/s^2
 	
 	public static void requestParameters() {
@@ -144,7 +144,7 @@ public class Configuration {
             int invalidPositions = 0;
             while(invalidPositions < INVALID_POSITION_LIMIT) {
             //int i = 0;
-            //while(i < ) {
+            //while(i < 10) {
             	//i++;
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = BOX_WIDTH * 0.1;
@@ -168,7 +168,7 @@ public class Configuration {
         }
     }
     
-    private static boolean validateParticlePosition(final List<Particle> particles, final double randomPositionX,
+    public static boolean validateParticlePosition(final List<Particle> particles, final double randomPositionX,
     		final double randomPositionY, final double radius) {
         if(particles.isEmpty())
             return true;
