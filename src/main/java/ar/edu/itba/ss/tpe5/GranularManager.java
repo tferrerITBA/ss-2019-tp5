@@ -103,7 +103,7 @@ public class GranularManager {
         double boxHoleEndingX = boxHoleStartingX + Configuration.HOLE_WIDTH;
         if(Math.abs(p.getPosition().getY() - Configuration.MIN_PARTICLE_HEIGHT) < p.getRadius()
         		&& (p.getPosition().getX() < boxHoleStartingX || p.getPosition().getX() > boxHoleEndingX)) {
-        	horizBorderOverlap = -(p.getRadius() - Math.abs(p.getPosition().getY()));
+        	horizBorderOverlap = (p.getRadius() - Math.abs(p.getPosition().getY() - Configuration.MIN_PARTICLE_HEIGHT));
         } /*else if(p.getPosition().getY() + p.getRadius() > Configuration.BOX_HEIGHT) {
         	horizBorderOverlap = p.getRadius() - Math.abs(Configuration.BOX_HEIGHT - p.getPosition().getY());
         }*/
