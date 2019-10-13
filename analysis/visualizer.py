@@ -150,16 +150,16 @@ def ex2_4(simulations):
 
 def tp5_e1a():
   times = parseTimesFile('../exit.txt')
-  totalTime = 5 # seconds
-  windowSize = totalTime / 10 # 250ms
-  offset = windowSize / 5 # 50ms
+  totalTime = 20 # seconds
+  windowSize = totalTime / 20 # 1s
+  offset = windowSize / 50 # 20ms
 
   print(f'Amount of particles gone: {len(times)}')
   print(f'Last time: {times[-1]}')
 
   beginTime = times[0]
   exits = []
-  for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 6):
+  for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 80): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
     currentIdx = next(idx for idx, time in enumerate(times) if time >= beginTime + offset * iteration )
     initialTime = times[currentIdx]
     accumulated = 0
@@ -173,8 +173,8 @@ def tp5_e1a():
   ax.set_ylabel('Caudal [p/s]')
   ax.set_xlabel('Tiempo [s]')
   fig.tight_layout()
-  plt.plot([x * offset for x in range(len(exits))], exits, 'o-', markersize=4)
-  plt.show()
+  ax.plot([x * offset for x in range(len(exits))], exits, 'o-', markersize=4)
+  saveFig(fig, '1_1a')
 
 
 
