@@ -155,8 +155,11 @@ public class Configuration {
                     randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
                     randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius + MIN_PARTICLE_HEIGHT;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
-                    invalidPositions += (isValidPosition) ? 0 : 1;
-                }
+										invalidPositions += (isValidPosition) ? 0 : 1;
+										if (invalidPositions > INVALID_POSITION_LIMIT) break;
+								}
+								if (invalidPositions > INVALID_POSITION_LIMIT) break;
+								invalidPositions = 0;
                 Particle p = new Particle(radius, PARTICLE_MASS, randomPositionX, randomPositionY, INIT_VEL, INIT_VEL);
                 particles.add(p);
                 fw.write(p.getId() + " " + radius + " " + randomPositionX + " " + randomPositionY + " " + INIT_VEL + " " + INIT_VEL + "\n");
