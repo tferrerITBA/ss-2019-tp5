@@ -8,7 +8,8 @@ import java.util.Random;
 public class GranularManager {
 	
     private final Grid grid;
-    private final double timeStep;
+		private final double timeStep;
+		private double accumulatedTime = 0.0;
     
     public GranularManager(final Grid grid) {
     	this.grid = grid;
@@ -17,7 +18,6 @@ public class GranularManager {
     
     public void execute() {
 		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
-		double accumulatedTime = 0.0;
 		double accumulatedPrintingTime = 0.0;
 		double printingTimeLimit = 0.005; //s
 		System.out.println("TIME STEP " + timeStep);
@@ -25,7 +25,6 @@ public class GranularManager {
 			grid.calculateAllParticlesNeighbors();
 			if (accumulatedPrintingTime >= printingTimeLimit) {
 				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
-				Configuration.writeExitFile(accumulatedTime);
 				accumulatedPrintingTime = 0;
 			}
 			accumulatedTime += timeStep;
@@ -89,6 +88,9 @@ public class GranularManager {
     }
 
     private void repositionParticles(final Particle[] repParticles, final List<Particle> updatedParticles) {
+			// write to exit file
+			Configuration.writeExitFile(accumulatedTime);
+
 			double randomPositionX = 0;
 			double randomPositionY = Configuration.BOX_HEIGHT + Configuration.MIN_PARTICLE_HEIGHT - repParticles[0].getRadius();
 			Random r = new Random();

@@ -151,24 +151,30 @@ def ex2_4(simulations):
 def tp5_e1a():
   times = parseTimesFile('../exit.txt')
   totalTime = 5 # seconds
-  windowSize = totalTime / 200 # 25ms
-  offset = windowSize / 5 # 5ms
-
-  plt.plot(times)
-  plt.show()
+  windowSize = totalTime / 10 # 250ms
+  offset = windowSize / 5 # 50ms
 
   print(f'Amount of particles gone: {len(times)}')
   print(f'Last time: {times[-1]}')
 
   beginTime = times[0]
-  for iteration in range(30):
-    currentIdx = next(idx for idx, time in enumerate(times) if time > beginTime + offset * iteration )
+  exits = []
+  for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 6):
+    currentIdx = next(idx for idx, time in enumerate(times) if time >= beginTime + offset * iteration )
     initialTime = times[currentIdx]
     accumulated = 0
     while (times[currentIdx] < initialTime + windowSize):
       accumulated += 1
       currentIdx += 1
-    print(f'There are {accumulated} exits between {initialTime} and {times[currentIdx]}')
+    exits.append(accumulated)
+    # print(f'There are {accumulated} exits between {offset * iteration} and {offset * iteration + windowSize}')
+
+  fig, ax = plt.subplots()
+  ax.set_ylabel('Caudal [p/s]')
+  ax.set_xlabel('Tiempo [s]')
+  fig.tight_layout()
+  plt.plot([x * offset for x in range(len(exits))], exits, 'o-', markersize=4)
+  plt.show()
 
 
 
