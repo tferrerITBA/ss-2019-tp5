@@ -18,18 +18,22 @@ public class GranularManager {
     public void execute() {
 		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
 		double accumulatedTime = 0.0;
+		double accumulatedPrintingTime = 0.0;
+		double printingTimeLimit = 0.005; //s
 		System.out.println("TIME STEP " + timeStep);
-		int i = 0;
 		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
 			grid.calculateAllParticlesNeighbors();
-			if (i % 100 == 0) Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
+			if (accumulatedPrintingTime >= printingTimeLimit) {
+				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
+				accumulatedPrintingTime = 0;
+			}
 			accumulatedTime += timeStep;
+			accumulatedPrintingTime += timeStep;
 			List<Particle> updatedParticles = new ArrayList<>(previousParticles.size());
 			verletUpdate(previousParticles, updatedParticles);
 
 			grid.setParticles(updatedParticles);
 			grid.updateGridSections();
-			i++;
 		}
 	}
 
