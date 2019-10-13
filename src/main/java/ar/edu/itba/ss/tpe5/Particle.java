@@ -13,6 +13,7 @@ public class Particle implements Cloneable {
 	private int id;
 	private double radius;
 	private double mass;
+	private double pressure;
 	private Point2D.Double position;
 	private Point2D.Double velocity;
 	private Set<Particle> neighbors;
@@ -57,7 +58,9 @@ public class Particle implements Cloneable {
 	
 	@Override
 	public Particle clone() {
-		return new Particle(id, radius, mass, position.getX(), position.getY(), velocity.getX(), velocity.getY());
+		Particle p = new Particle(id, radius, mass, position.getX(), position.getY(), velocity.getX(), velocity.getY());
+		p.setPressure(p.getPressure());
+		return p;
 	}
 
 	public int getId() {
@@ -72,6 +75,10 @@ public class Particle implements Cloneable {
 		return mass;
 	}
 
+	public double getPressure() {
+		return Math.abs(pressure);
+	}
+
 	public Point2D.Double getPosition() {
 		return position;
 	}
@@ -79,6 +86,15 @@ public class Particle implements Cloneable {
 	public void setPosition(double x, double y) {
 		position.x = x;
 		position.y = y;
+	}
+
+	public void calculatePressure(double forces) {
+		double perimeter =  Math.PI * 2.0 * radius;
+		this.pressure = forces / perimeter;
+	}
+
+	public void setPressure(double pressure) {
+		this.pressure = pressure;
 	}
 
 	public Point2D.Double getVelocity() {

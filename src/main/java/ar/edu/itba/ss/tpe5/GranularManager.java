@@ -78,7 +78,8 @@ public class GranularManager {
                 	System.out.println(currParticle.getId() + " Y " + newPositionY + " ACC " + acceleration + " VEL " + newVelocityY);
                 if(newPositionX > 1)
                 	System.out.println(currParticle.getId() + " X " + newPositionX + " ACC " + acceleration + " VEL " + newVelocityX);
-            }
+						}
+						updatedParticle.setPressure(currParticle.getPressure());
             updatedParticles.add(updatedParticle);
         }
         for(Particle[] repParticles : repositionParticles) {
@@ -122,6 +123,7 @@ public class GranularManager {
     private Point2D.Double getParticleForce(final Particle p) {
     	double resultantForceX = 0;
 			double resultantForceY = 0;
+			double resultantForceN = 0;
 			List<Particle> neighbors = new ArrayList<>(p.getNeighbors());
 			// Add as neighbors two particles for the corners
 			neighbors.add(new Particle(Configuration.MIN_PARTICLE_RADIUS * 0.1, Configuration.PARTICLE_MASS, (Configuration.BOX_WIDTH - Configuration.HOLE_WIDTH) / 2, Configuration.MIN_PARTICLE_HEIGHT, 0, 0));
@@ -141,10 +143,11 @@ public class GranularManager {
 					//if (overlap > 0) System.out.println(overlap);
         	Point2D.Double relativeVelocity = p.getRelativeVelocity(n);
         	
-        	double normalForce = - Configuration.K_NORM * overlap;
+					double normalForce = - Configuration.K_NORM * overlap;
         	double tangentForce = - Configuration.K_TANG * overlap * (relativeVelocity.getX() * tangentUnitVector.getX()
-        			+ relativeVelocity.getY() * tangentUnitVector.getY());
+					+ relativeVelocity.getY() * tangentUnitVector.getY());
         	
+					resultantForceN += normalForce;
         	resultantForceX += normalForce * normalUnitVector.getX() + tangentForce * (- normalUnitVector.getY());
 					resultantForceY += normalForce * normalUnitVector.getY() + tangentForce * normalUnitVector.getX();
 					
@@ -183,7 +186,8 @@ public class GranularManager {
 				// if (vertBorderOverlap > 0) System.out.println(vertBorderOverlap);
 
         
-        resultantForceY += p.getMass() * Configuration.GRAVITY;
+				resultantForceY += p.getMass() * Configuration.GRAVITY;
+				p.calculatePressure(resultantForceN);
         return new Point2D.Double(resultantForceX, resultantForceY);
     }
 

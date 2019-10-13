@@ -216,7 +216,7 @@ public class Configuration {
 			fw.write(particleCount + "\n");
 			fw.write("Lattice=\"" + BOX_WIDTH + " 0.0 0.0 0.0 " + BOX_HEIGHT 
 				+ " 0.0 0.0 0.0 1.0"
-				+ "\" Properties=id:I:1:radius:R:1:pos:R:2:velo:R:2 Time=" + String.format(Locale.US, "%.2g", time) + "\n");
+				+ "\" Properties=id:I:1:radius:R:1:pos:R:2:velo:R:2:Pressure:R:1 Time=" + String.format(Locale.US, "%.2g", time) + "\n");
 			for(Particle p : particles) {
 				writeOvitoParticle(fw, p);
 			}
@@ -238,7 +238,7 @@ public class Configuration {
 	
 	private static void writeOvitoParticle(FileWriter fw, Particle particle) throws IOException {
 		fw.write(particle.getId() + " " + particle.getRadius() + " " + particle.getPosition().x + " "
-				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y);
+				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y + " " + particle.getPressure());
 		//double angle = particle.getVelocityAngle();
 		//fw.write(((Math.cos(angle) + 1) / 2) + " " + ((Math.sin(angle) + 1) / 2) + " " + Math.tan((angle + Math.PI) / 8));
 		fw.write('\n');
