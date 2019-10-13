@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion, calculateKineticEnergy
+from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion, calculateKineticEnergy, calculateExitsValues
 from parser import parseDirectoryFromArgs, parseModeFromArgs, parseTimesFile
 from calculator import errorFn, discreteRange, PDF, mb
 import os
@@ -150,15 +150,15 @@ def ex2_4(simulations):
 
 def tp5_e1a():
   times = parseTimesFile('../exit.txt')
-  totalTime = 120 # seconds
-  windowSize = 1 # 1s
-  offset = 0.2 # 200ms
+  totalTime = 1 # seconds
+  windowSize = 0.1 # 1s
+  offset = 0.02 # 200ms
 
   print(f'Amount of particles gone: {len(times)}')
   print(f'Last time: {times[-1]}')
 
   exits = []
-  for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 80): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
+  for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 5): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
     currentIdx = next(idx for idx, time in enumerate(times) if time >= offset * iteration )
     initialTime = times[currentIdx]
     accumulated = 0
@@ -168,6 +168,11 @@ def tp5_e1a():
     exits.append(accumulated)
     # print(f'There are {accumulated} exits between {offset * iteration} and {offset * iteration + windowSize}')
 
+
+  # average last third of exits
+  avg, err = calculateExitsValues(exits)
+  print(f'Caudal promedio: {avg}')
+  print(f'Error: {err}')
   fig, ax = plt.subplots(figsize=(16,4))
   ax.set_ylabel('Caudal [p/s]')
   ax.set_xlabel('Tiempo [s]')
@@ -180,27 +185,41 @@ def tp5_e1b(simulations):
     kineticEnergy = calculateKineticEnergy(simulation)
     dt = 0.005 # seconds
     fig, ax = plt.subplots()
+    # ax.set_yscale('log')
     ax.set_ylabel('Energía cinética [J]')
     ax.set_xlabel('Tiempo [s]')
     fig.tight_layout()
     ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=4)
     saveFig(fig, '1_1b')
 
+def bev():
+  xs = [0.15, 0.17, 0.22, 0.25]
+  ys = [1, 2, 3, 4]
+  err = [0.1, 0.1, 0.1, 0.1]
+  results, rang = errorFn(xs, ys)
+  fig, ax = plt.subplots()
+  ax.set_ylabel('Caudal promedio [p/s]')
+  ax.set_xlabel('Ancho de apertura [m]')
+  fig.tight_layout()
+  ax.plot(xs, ys, 'o-', markersize=4)
+  ax.plot(rang, results, 'o', markersize=2) 
+  saveFig(fig, '1_1bev')
+
 
 
 def run():
   print("Parse simulations\n")
-  if os.path.exists('22a.tmp'):
-    print("File exists!\n")
-    file = open('22a.tmp', 'rb')
-    simulations = pickle.load(file)
-    file.close()
-  else:
+  # if os.path.exists('22a.tmp'):
+  #   print("File exists!\n")
+  #   file = open('22a.tmp', 'rb')
+  #   simulations = pickle.load(file)
+  #   file.close()
+  # else:
     simulations = parseDirectoryFromArgs()
-    file = open('22a.tmp', 'wb')
-    print("Saving file\n")
-    pickle.dump(simulations, file)
-    file.close()
+    # file = open('22a.tmp', 'wb')
+    # print("Saving file\n")
+    # pickle.dump(simulations, file)
+    # file.close()
   print("Parse mode\n")
   mode = parseModeFromArgs()
   if mode == 1:
@@ -218,5 +237,7 @@ def run():
     tp5_e1a()
   elif mode == 7:
     tp5_e1b(simulations)
+  elif mode == 8:
+    bev()
 
 run()

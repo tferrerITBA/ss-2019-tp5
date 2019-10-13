@@ -1,4 +1,4 @@
-from calculator import calculateDistance, squareList, averageLists, linearRegression, calculateDeltas, average, discreteRange, PDF, stdevLists
+from calculator import calculateDistance, squareList, averageLists, linearRegression, calculateDeltas, average, discreteRange, PDF, stdevLists, average
 from functools import reduce #python 3
 import numpy
 
@@ -47,6 +47,12 @@ def calculateKineticEnergy(simulation):
   kineticsList = [ map(getEnergy, particles) for particles in particlesList]
   kineticsSteps = [sum(kinetics) for kinetics in kineticsList]
   return kineticsSteps
+
+def calculateExitsValues(qs):
+  lastThird = qs[-len(qs)//3:]
+  avg = averageLists(lastThird)
+  err = stdevLists(lastThird)
+  return avg, err
 
 def calculateDiffusion(simulations, getDistanceFromOrigin = getBallDistancesFromOrigin):
   squaredDistances = [squareList(getDistanceFromOrigin(simulation)) for simulation in simulations]
