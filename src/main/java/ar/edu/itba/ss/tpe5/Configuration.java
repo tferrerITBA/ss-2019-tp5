@@ -18,8 +18,8 @@ public class Configuration {
 	private static final String INPUT_FILE_NAME = "config.txt";
 	private static final String OUTPUT_FILE_NAME = "ovito_output.xyz";
 	private static final String EXIT_FILE_NAME = "exit.txt";
-	public static final double BOX_WIDTH = 1; // m
-	public static final double BOX_HEIGHT = 1; // m
+	public static final double BOX_WIDTH = 0.4; // m
+	public static final double BOX_HEIGHT = 1.5; // m
 	public static final double HOLE_WIDTH = 0.25; // m
 	public static final double MIN_PARTICLE_HEIGHT = BOX_HEIGHT / 10; // m
 	public static final double MIN_PARTICLE_RADIUS = 0.01; // m
