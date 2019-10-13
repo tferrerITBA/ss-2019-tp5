@@ -21,13 +21,13 @@ public class Configuration {
 	public static final double BOX_HEIGHT = 1; // m
 	public static final double HOLE_WIDTH = 0.25; // m
 	public static final double MIN_PARTICLE_HEIGHT = BOX_HEIGHT / 10; // m
-	private static final double MIN_PARTICLE_RADIUS = 0.01; // m
+	public static final double MIN_PARTICLE_RADIUS = 0.01; // m
 	private static final double MAX_PARTICLE_RADIUS = 0.015; // m
 	private static final int PARTICLE_GEN_STEP_LIMIT = 100;
 	public static final double K_NORM = 1e5;
 	public static final double K_TANG = 2 * K_NORM;
 //	private static final double GAMMA = 70.0; // kg/s
-	private static final double PARTICLE_MASS = 0.01; // kg
+	public static final double PARTICLE_MASS = 0.01; // kg
 	private static final double INIT_VEL = 0.0; // m/s
 	private static int particleCount;
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);

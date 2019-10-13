@@ -116,8 +116,12 @@ public class GranularManager {
 
     private Point2D.Double getParticleForce(final Particle p) {
     	double resultantForceX = 0;
-    	double resultantForceY = 0;
-        for(Particle n : p.getNeighbors()) {
+			double resultantForceY = 0;
+			List<Particle> neighbors = new ArrayList<>(p.getNeighbors());
+			// Add as neighbors two particles for the corners
+			neighbors.add(new Particle(Configuration.MIN_PARTICLE_RADIUS * 0.1, Configuration.PARTICLE_MASS, (Configuration.BOX_WIDTH - Configuration.HOLE_WIDTH) / 2, Configuration.MIN_PARTICLE_HEIGHT, 0, 0));
+			neighbors.add(new Particle(Configuration.MIN_PARTICLE_RADIUS * 0.1, Configuration.PARTICLE_MASS, (Configuration.BOX_WIDTH - Configuration.HOLE_WIDTH) / 2 + Configuration.HOLE_WIDTH, Configuration.MIN_PARTICLE_HEIGHT, 0, 0));
+        for(Particle n : neighbors) {
         	double normalUnitVectorX = (n.getPosition().getX() - p.getPosition().getX()) / Math.abs(n.getRadius() - p.getRadius());
         	double normalUnitVectorY = (n.getPosition().getY() - p.getPosition().getY()) / Math.abs(n.getRadius() - p.getRadius());
         	double norm = Math.sqrt(Math.pow(normalUnitVectorX, 2) + Math.pow(normalUnitVectorY, 2));
