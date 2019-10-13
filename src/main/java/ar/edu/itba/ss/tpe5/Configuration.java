@@ -17,6 +17,7 @@ public class Configuration {
 
 	private static final String INPUT_FILE_NAME = "config.txt";
 	private static final String OUTPUT_FILE_NAME = "ovito_output.xyz";
+	private static final String EXIT_FILE_NAME = "exit.txt";
 	public static final double BOX_WIDTH = 1; // m
 	public static final double BOX_HEIGHT = 1; // m
 	public static final double HOLE_WIDTH = 0.25; // m
@@ -60,6 +61,7 @@ public class Configuration {
 		generateInputFile();
 		List<Particle> particles = parseConfiguration();
 		generateOvitoOutputFile();
+		generateExitFile();
 		return particles;
 	}
 	
@@ -196,6 +198,17 @@ public class Configuration {
 			e.printStackTrace();
 		}
 	}
+
+	private static void generateExitFile() {
+		File exitFile = new File(EXIT_FILE_NAME);
+		exitFile.delete();
+		try {
+			exitFile.createNewFile();
+		} catch (IOException e) {
+			System.err.println("Failed to create exit file.");
+			e.printStackTrace();
+		}
+	}
 	
 	public static void writeOvitoOutputFile(double time, List<Particle> particles) {
 		File outputFile = new File(OUTPUT_FILE_NAME);
@@ -209,6 +222,16 @@ public class Configuration {
 			}
 		} catch (IOException e) {
 			System.err.println("Failed to write Ovito output file.");
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeExitFile(double time) {
+		File outputFile = new File(EXIT_FILE_NAME);
+		try(FileWriter fw = new FileWriter(outputFile, true)) {
+			fw.write(time + "\n");
+		} catch (IOException e) {
+			System.err.println("Failed to write exit file.");
 			e.printStackTrace();
 		}
 	}

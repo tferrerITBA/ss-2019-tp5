@@ -25,6 +25,7 @@ public class GranularManager {
 			grid.calculateAllParticlesNeighbors();
 			if (accumulatedPrintingTime >= printingTimeLimit) {
 				Configuration.writeOvitoOutputFile(accumulatedTime, grid.getParticles());
+				Configuration.writeExitFile(accumulatedTime);
 				accumulatedPrintingTime = 0;
 			}
 			accumulatedTime += timeStep;
