@@ -1,10 +1,11 @@
 import numpy
+import math
 
 class Particle:
-  def __init__(self, id, radius, mass, x, y, vx, vy, pressure):
+  def __init__(self, id, radius, x, y, vx, vy, pressure):
     self.id = int(id)
     self.radius = float(radius)
-    self.mass = float(mass)
+    self.mass = 0.01
     self.x = float(x)
     self.y = float(y)
     self.vx = float(vx)

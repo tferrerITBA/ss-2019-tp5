@@ -190,18 +190,18 @@ def tp5_e1b(simulations):
 
 def run():
   print("Parse simulations\n")
-  # if os.path.exists('22a.tmp'):
-  #   print("File exists!\n")
-  #   file = open('22a.tmp', 'rb')
-  #   simulations = pickle.load(file)
-  #   file.close()
-  # else:
-  #   simulations = parseDirectoryFromArgs()
-  #   file = open('22a.tmp', 'wb')
-  #   print("Saving file\n")
-  #   pickle.dump(simulations, file)
-  #   file.close()
-  # print("Parse mode\n")
+  if os.path.exists('22a.tmp'):
+    print("File exists!\n")
+    file = open('22a.tmp', 'rb')
+    simulations = pickle.load(file)
+    file.close()
+  else:
+    simulations = parseDirectoryFromArgs()
+    file = open('22a.tmp', 'wb')
+    print("Saving file\n")
+    pickle.dump(simulations, file)
+    file.close()
+  print("Parse mode\n")
   mode = parseModeFromArgs()
   if mode == 1:
     ex3_4(simulations)

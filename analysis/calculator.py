@@ -56,8 +56,8 @@ def beverloo(x,c):
   gravity = 9.8
   hole_size = 1.5
   mean_radius = 0.025 # average of particles radius
-  np = 10 # particles per unit of area
-  return math.sqrt(gravity) * ((hole_size - c * mean_radius) ** 1.5)
+  n = 886 / (1 * 0.1) # particles per unit of area
+  return n * math.sqrt(gravity) * ((hole_size - c * mean_radius) ** 1.5)
 
 def errorCalculator(xs, ys, approxFn, c):
   results = []

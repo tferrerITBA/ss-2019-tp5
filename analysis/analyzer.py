@@ -43,7 +43,8 @@ def calculateProbabilityVelocities(simulation):
 
 def calculateKineticEnergy(simulation):
   particlesList = [step.particles for step in simulation.steps]
-  kineticsList = [ (particle.mass * (particle.getVelocityLength() ** 2)) / 2.0 for particles in particlesList]
+  getEnergy = lambda particle: (particle.mass * (particle.getVelocityLength() ** 2)) / 2.0
+  kineticsList = [ map(getEnergy, particles) for particles in particlesList]
   kineticsSteps = [sum(kinetics) for kinetics in kineticsList]
   return kineticsSteps
 
