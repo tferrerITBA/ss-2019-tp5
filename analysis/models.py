@@ -1,7 +1,7 @@
 import numpy
 
 class Particle:
-  def __init__(self, id, radius, mass, x, y, vx, vy, speed):
+  def __init__(self, id, radius, mass, x, y, vx, vy, pressure):
     self.id = int(id)
     self.radius = float(radius)
     self.mass = float(mass)
@@ -9,9 +9,9 @@ class Particle:
     self.y = float(y)
     self.vx = float(vx)
     self.vy = float(vy)
-    self.speed = float(speed)
+    self.pressure = float(pressure)
   def getVelocityLength(self):
-    return self.speed
+    return math.sqrt(self.vx ** 2  + self.vy ** 2)
   def position(self):
     return (self.x, self.y)
   def __str__(self):

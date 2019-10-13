@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion
+from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion, calculateKineticEnergy
 from parser import parseDirectoryFromArgs, parseModeFromArgs, parseTimesFile
 from calculator import errorFn, discreteRange, PDF, mb
 import os
@@ -157,10 +157,9 @@ def tp5_e1a():
   print(f'Amount of particles gone: {len(times)}')
   print(f'Last time: {times[-1]}')
 
-  beginTime = times[0]
   exits = []
   for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 80): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
-    currentIdx = next(idx for idx, time in enumerate(times) if time >= beginTime + offset * iteration )
+    currentIdx = next(idx for idx, time in enumerate(times) if time >= offset * iteration )
     initialTime = times[currentIdx]
     accumulated = 0
     while (times[currentIdx] < initialTime + windowSize):
@@ -175,6 +174,17 @@ def tp5_e1a():
   fig.tight_layout()
   ax.plot([x * offset for x in range(len(exits))], exits, 'o-', markersize=4)
   saveFig(fig, '1_1a')
+
+def tp5_e1b(simulations):
+  for simulation in simulations:
+    kineticEnergy = calculateKineticEnergy(simulation)
+    dt = 0.005 # seconds
+    fig, ax = plt.subplots()
+    ax.set_ylabel('Energía cinética [J]')
+    ax.set_xlabel('Tiempo [s]')
+    fig.tight_layout()
+    ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=4)
+    saveFig(fig, '1_1b')
 
 
 
@@ -206,5 +216,7 @@ def run():
     ex2_4(simulations)
   elif mode == 6:
     tp5_e1a()
+  elif mode == 7:
+    tp5_e1b(simulations)
 
 run()

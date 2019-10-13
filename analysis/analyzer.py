@@ -41,6 +41,12 @@ def calculateProbabilityVelocities(simulation):
   hist, bin_edges = PDF(speeds, 0.2)
   return hist * calculateDeltas(bin_edges)
 
+def calculateKineticEnergy(simulation):
+  particlesList = [step.particles for step in simulation.steps]
+  kineticsList = [ (particle.mass * (particle.getVelocityLength() ** 2)) / 2.0 for particles in particlesList]
+  kineticsSteps = [sum(kinetics) for kinetics in kineticsList]
+  return kineticsSteps
+
 def calculateDiffusion(simulations, getDistanceFromOrigin = getBallDistancesFromOrigin):
   squaredDistances = [squareList(getDistanceFromOrigin(simulation)) for simulation in simulations]
   maxTimes = max([len(squaredDistance) for squaredDistance in squaredDistances])
