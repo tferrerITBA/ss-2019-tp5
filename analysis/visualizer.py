@@ -149,7 +149,27 @@ def ex2_4(simulations):
     saveFig(fig, '2_4_error')
 
 def tp5_e1a():
-  times = parseTimesFile('exit.txt')
+  times = parseTimesFile('../exit.txt')
+  totalTime = 5 # seconds
+  windowSize = totalTime / 200 # 25ms
+  offset = windowSize / 5 # 5ms
+
+  plt.plot(times)
+  plt.show()
+
+  print(f'Amount of particles gone: {len(times)}')
+  print(f'Last time: {times[-1]}')
+
+  beginTime = times[0]
+  for iteration in range(30):
+    currentIdx = next(idx for idx, time in enumerate(times) if time > beginTime + offset * iteration )
+    initialTime = times[currentIdx]
+    accumulated = 0
+    while (times[currentIdx] < initialTime + windowSize):
+      accumulated += 1
+      currentIdx += 1
+    print(f'There are {accumulated} exits between {initialTime} and {times[currentIdx]}')
+
 
 
 def run():

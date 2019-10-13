@@ -36,3 +36,4 @@ target
 
 #MAC
 .DS_Store
+__pycache__/
