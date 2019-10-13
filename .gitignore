@@ -33,3 +33,6 @@ hs_err_pid*
 target
 *.iml
 *.txt
+
+#MAC
+.DS_Store
