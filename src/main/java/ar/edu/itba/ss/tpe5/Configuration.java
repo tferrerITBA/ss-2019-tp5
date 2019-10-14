@@ -26,7 +26,8 @@ public class Configuration {
 	private static final double MAX_PARTICLE_RADIUS = 0.015; // m
 	private static final int PARTICLE_GEN_STEP_LIMIT = 100;
 	public static final double K_NORM = 1e5;
-	public static final double K_TANG = 2 * K_NORM;
+	public static double K_FACTOR = 2.0;
+	public static final double K_TANG = K_FACTOR * K_NORM;
 //	private static final double GAMMA = 70.0; // kg/s
 	public static final double PARTICLE_MASS = 0.01; // kg
 	private static final double INIT_VEL = 0.0; // m/s
@@ -62,7 +63,13 @@ public class Configuration {
 	    while(width <=0 ) {
 	    	width = stringToDouble(scanner.nextLine());
 			}
-			HOLE_WIDTH = width;
+			System.out.println("Enter K factor:");
+			double k = 0;
+	    while(k <=0 ) {
+	    	k = stringToDouble(scanner.nextLine());
+			}
+			HOLE_WIDTH = 0;
+			K_FACTOR = k;
 			INPUT_FILE_NAME = fileName + "-input.txt";
 			OUTPUT_FILE_NAME = fileName + ".xyz";
 			EXIT_FILE_NAME = fileName + ".txt";

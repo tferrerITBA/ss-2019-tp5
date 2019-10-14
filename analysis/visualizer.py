@@ -202,29 +202,40 @@ def tp5_e1a():
   # plt.show()
 
 def tp5_e1b(simulations):
-    kineticEnergies = [calculateKineticEnergy(simulation) for simulation in simulations]
-    kineticEnergy = averageLists(kineticEnergies)
-    kineticErrs = stdevLists(kineticEnergies)
     dt = 0.005 # seconds
-    fig, ax = plt.subplots()
-    # ax.set_yscale('log')
+    leftOffset = 0
+   
+    fig, ax = plt.subplots(figsize=(16,4))
+    ax.set_yscale('log')
     ax.set_ylabel('Energía cinética [J]')
     ax.set_xlabel('Tiempo [s]')
     fig.tight_layout()
-    ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=3)
-    saveFig(fig, '1_1b')
+
+    for simulation in simulations:
+      kineticEnergy = calculateKineticEnergy(simulation)
+      xs = [x * dt for x in range(len(kineticEnergy))]
+      ax.plot(xs[leftOffset:], kineticEnergy[leftOffset:], '-', label=f'D = {simulation.name}', linewidth=1)
+    ax.legend()
+
+    saveFig(fig, f'1_1b')
 
 def tp5_e1c(simulations):
-  for simulation in simulations:
-    kineticEnergy = calculateKineticEnergy(simulation)
     dt = 0.005 # seconds
-    fig, ax = plt.subplots()
-    # ax.set_yscale('log')
+    leftOffset = 0
+   
+    fig, ax = plt.subplots(figsize=(16,4))
+    ax.set_yscale('log')
     ax.set_ylabel('Energía cinética [J]')
     ax.set_xlabel('Tiempo [s]')
     fig.tight_layout()
-    ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=4)
-    saveFig(fig, '1_1b')
+
+    for simulation in simulations:
+      kineticEnergy = calculateKineticEnergy(simulation)
+      xs = [x * dt for x in range(len(kineticEnergy))]
+      ax.plot(xs[leftOffset:], kineticEnergy[leftOffset:], '-', label=f'Kt = {simulation.name} x 10^5', linewidth=1)
+    ax.legend()
+
+    saveFig(fig, f'1_1c')
 
 
 def run():
@@ -232,21 +243,22 @@ def run():
   print("python analysis/visualizer.py analysis/results 7")
   print("python analysis/visualizer.py analysis/results 8")
   print("Las imágenes se guardan en la carpeta output de la raiz del proyecto.")
-  print("Parse simulations\n")
-  # if os.path.exists('22a.tmp'):
-  #   print("File exists!\n")
-  #   file = open('22a.tmp', 'rb')
-  #   simulations = pickle.load(file)
-  #   file.close()
-  # else:
-    # file = open('22a.tmp', 'wb')
-    # print("Saving file\n")
-    # pickle.dump(simulations, file)
-    # file.close()
-  print("Parse mode\n")
+  print("Parse mode")
   mode = parseModeFromArgs()
-  if (mode != 6):
+
+  print("Parse simulations")
+  if os.path.exists(f'{mode}.tmp'):
+    print("File exists!")
+    file = open(f'{mode}.tmp', 'rb')
+    simulations = pickle.load(file)
+    file.close()
+  elif mode != 6:
+    file = open(f'{mode}.tmp', 'wb')
     simulations = parseDirectoryFromArgs()
+    print("Saving file")
+    pickle.dump(simulations, file)
+    file.close()
+
   if mode == 1:
     ex3_4(simulations)
   elif mode == 2:
@@ -263,6 +275,6 @@ def run():
   elif mode == 7:
     tp5_e1b(simulations)
   elif mode == 8:
-    bev()
+    tp5_e1c(simulations)
 
 run()

@@ -18,7 +18,7 @@ def parseFile(filename):
   steps = []
   while len(lines) > 0:
     steps.append(parseStep(lines))
-  return Simulation(steps, os.path.basename(filename))
+  return Simulation(steps, os.path.basename(filename).split('.xyz')[0])
 
 def parseDirectory(directory, parse=parseFile):
   dirs = glob.glob(directory + '/*')
