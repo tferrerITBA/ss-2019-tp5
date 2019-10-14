@@ -9,9 +9,6 @@ def parseDirectoryFromArgs():
 def parseModeFromArgs():
   return int(sys.argv[2])
 
-def parseDirectory(directory):
-  return [parseFile(f) for f in glob.glob(directory + '/*')]
-
 def parseTimesFile(filename):
   times = [float(line.rstrip('\n')) for line in open(filename)]
   return times
@@ -22,6 +19,10 @@ def parseFile(filename):
   while len(lines) > 0:
     steps.append(parseStep(lines))
   return Simulation(steps, os.path.basename(filename))
+
+def parseDirectory(directory, parse=parseFile):
+  return [parse(f) for f in glob.glob(directory + '/*')]
+
 
 def parseStep(lines):
   nextLines = int(lines.pop(0))

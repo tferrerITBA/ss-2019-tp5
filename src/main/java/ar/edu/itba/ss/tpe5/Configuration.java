@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 
 public class Configuration {
 
-	private static final String INPUT_FILE_NAME = "config.txt";
-	private static final String OUTPUT_FILE_NAME = "ovito_output.xyz";
-	private static final String EXIT_FILE_NAME = "exit.txt";
+	private static String INPUT_FILE_NAME = "config.txt";
+	private static String OUTPUT_FILE_NAME = "ovito_output.xyz";
+	private static String EXIT_FILE_NAME = "exit.txt";
 	public static final double BOX_WIDTH = 0.4; // m
 	public static final double BOX_HEIGHT = 1.5; // m
 	public static final double HOLE_WIDTH = 0.25; // m
@@ -34,7 +34,8 @@ public class Configuration {
 	private static double timeStep = 0.1 * Math.sqrt(PARTICLE_MASS / K_NORM);
 	private static double timeLimit;
 	private static final int INVALID_POSITION_LIMIT = 500;
-    public static final double GRAVITY = -9.8; // m/s^2
+		public static final double GRAVITY = -9.8; // m/s^2
+	private static String fileName = "";
 	
 	public static void requestParameters() {
 		Scanner scanner = new Scanner(System.in);
@@ -52,6 +53,13 @@ public class Configuration {
 	    	selectedTimeLimit = stringToDouble(scanner.nextLine());
 	    }
 	    timeLimit = selectedTimeLimit;
+	    System.out.println("Enter Filename:");
+	    while(fileName == "") {
+	    	fileName = scanner.nextLine();
+			}
+			INPUT_FILE_NAME = fileName + "-input.txt";
+			OUTPUT_FILE_NAME = fileName + ".xyz";
+			EXIT_FILE_NAME = fileName + ".txt";
 	    
 	    scanner.close();
 	}

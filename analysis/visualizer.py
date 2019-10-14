@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion, calculateKineticEnergy, calculateExitsValues
-from parser import parseDirectoryFromArgs, parseModeFromArgs, parseTimesFile
-from calculator import errorFn, discreteRange, PDF, mb
+from parser import parseDirectoryFromArgs, parseModeFromArgs, parseTimesFile, parseDirectory
+from calculator import errorFn, discreteRange, PDF, mb, averageLists
 import os
 import pickle
 
@@ -149,38 +149,52 @@ def ex2_4(simulations):
     saveFig(fig, '2_4_error')
 
 def tp5_e1a():
-  times = parseTimesFile('../exit.txt')
-  totalTime = 1 # seconds
-  windowSize = 0.1 # 1s
-  offset = 0.02 # 200ms
+  timesList = parseDirectory('analysis/exits', parseTimesFile)
+  totalTime = 5 # seconds
+  windowSize = 1 # 1s
+  offset = 0.1 # 100ms
 
-  print(f'Amount of particles gone: {len(times)}')
-  print(f'Last time: {times[-1]}')
+  exitsList = []
+  for times in timesList:
+    print(f'Amount of particles gone: {len(times)}')
+    print(f'Last time: {times[-1]}')
 
-  exits = []
-  for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 5): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
-    currentIdx = next(idx for idx, time in enumerate(times) if time >= offset * iteration )
-    initialTime = times[currentIdx]
-    accumulated = 0
-    while (times[currentIdx] < initialTime + windowSize):
-      accumulated += 1
-      currentIdx += 1
-    exits.append(accumulated)
-    # print(f'There are {accumulated} exits between {offset * iteration} and {offset * iteration + windowSize}')
-
+    exits = []
+    for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 10): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
+      currentIdx = next(idx for idx, time in enumerate(times) if time >= offset * iteration )
+      initialTime = times[currentIdx]
+      accumulated = 0
+      while (times[currentIdx] < initialTime + windowSize):
+        accumulated += 1
+        currentIdx += 1
+      exits.append(accumulated)
+    exitsList.append(exits)
 
   # average last third of exits
-  avg, err = calculateExitsValues(exits)
+  avg, err = calculateExitsValues(exitsList)
   print(f'Caudal promedio: {avg}')
   print(f'Error: {err}')
-  fig, ax = plt.subplots(figsize=(16,4))
+  fig, ax = plt.subplots()
   ax.set_ylabel('Caudal [p/s]')
   ax.set_xlabel('Tiempo [s]')
+  ax.errorbar([x * offset for x in range(len(avg))], avg, yerr=err, fmt='o-', markersize=4)
   fig.tight_layout()
-  ax.plot([x * offset for x in range(len(exits))], exits, 'o-', markersize=2, mfc="r", mec="r")
+  plt.show()
   saveFig(fig, '1_1a')
 
 def tp5_e1b(simulations):
+    kineticEnergies = [calculateKineticEnergy(simulation) for simulation in simulations]
+    kineticEnergy = averageLists(kineticEnergies)
+    dt = 0.005 # seconds
+    fig, ax = plt.subplots()
+    # ax.set_yscale('log')
+    ax.set_ylabel('Energía cinética [J]')
+    ax.set_xlabel('Tiempo [s]')
+    fig.tight_layout()
+    ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=4)
+    saveFig(fig, '1_1b')
+
+def tp5_e1c(simulations):
   for simulation in simulations:
     kineticEnergy = calculateKineticEnergy(simulation)
     dt = 0.005 # seconds
@@ -215,7 +229,7 @@ def run():
   #   simulations = pickle.load(file)
   #   file.close()
   # else:
-    simulations = parseDirectoryFromArgs()
+  simulations = parseDirectoryFromArgs()
     # file = open('22a.tmp', 'wb')
     # print("Saving file\n")
     # pickle.dump(simulations, file)
