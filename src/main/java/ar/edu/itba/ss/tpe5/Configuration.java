@@ -24,10 +24,8 @@ public class Configuration {
 	public static final double MIN_PARTICLE_HEIGHT = BOX_HEIGHT / 10; // m
 	public static final double MIN_PARTICLE_RADIUS = 0.01; // m
 	private static final double MAX_PARTICLE_RADIUS = 0.015; // m
-	private static final int PARTICLE_GEN_STEP_LIMIT = 100;
 	public static final double K_NORM = 1e5;
 	public static final double K_TANG = 2 * K_NORM;
-//	private static final double GAMMA = 70.0; // kg/s
 	public static final double PARTICLE_MASS = 0.01; // kg
 	private static final double INIT_VEL = 0.0; // m/s
 	private static int particleCount;
@@ -39,13 +37,6 @@ public class Configuration {
 	
 	public static void requestParameters() {
 		Scanner scanner = new Scanner(System.in);
-
-//		System.out.println("Enter Time Step:");
-//		Double selectedTimeStep = null;
-//		while(selectedTimeStep == null || selectedTimeStep <= 0) {
-//			selectedTimeStep = stringToDouble(scanner.nextLine());
-//		}
-//		timeStep = selectedTimeStep;
 	    
 	    System.out.println("Enter Time Limit:");
     	Double selectedTimeLimit = null;
@@ -56,10 +47,10 @@ public class Configuration {
 	    System.out.println("Enter Filename:");
 	    while(fileName == "") {
 	    	fileName = scanner.nextLine();
-			}
-			INPUT_FILE_NAME = fileName + "-input.txt";
-			OUTPUT_FILE_NAME = fileName + ".xyz";
-			EXIT_FILE_NAME = fileName + ".txt";
+		}
+		INPUT_FILE_NAME = fileName + "-input.txt";
+		OUTPUT_FILE_NAME = fileName + ".xyz";
+		EXIT_FILE_NAME = fileName + ".txt";
 	    
 	    scanner.close();
 	}
@@ -153,9 +144,6 @@ public class Configuration {
             Random r = new Random();
             int invalidPositions = 0;
             while(invalidPositions < INVALID_POSITION_LIMIT) {
-            //int i = 0;
-            //while(i < 10) {
-            	//i++;
             	double radius = r.nextDouble() * (MAX_PARTICLE_RADIUS - MIN_PARTICLE_RADIUS) + MIN_PARTICLE_RADIUS;
                 double randomPositionX = BOX_WIDTH * 0.1;
                 double randomPositionY = BOX_HEIGHT * 0.9;
@@ -165,11 +153,12 @@ public class Configuration {
                     randomPositionX = (BOX_WIDTH - 2 * radius) * r.nextDouble() + radius;
                     randomPositionY = (BOX_HEIGHT - 2 * radius) * r.nextDouble() + radius + MIN_PARTICLE_HEIGHT;
                     isValidPosition = validateParticlePosition(particles, randomPositionX, randomPositionY, radius);
-										invalidPositions += (isValidPosition) ? 0 : 1;
-										if (invalidPositions > INVALID_POSITION_LIMIT) break;
-								}
-								if (invalidPositions > INVALID_POSITION_LIMIT) break;
-								invalidPositions = 0;
+					
+                    invalidPositions += (isValidPosition) ? 0 : 1;
+					if (invalidPositions > INVALID_POSITION_LIMIT) break;
+				}
+				if (invalidPositions > INVALID_POSITION_LIMIT) break;
+				invalidPositions = 0;
                 Particle p = new Particle(radius, PARTICLE_MASS, randomPositionX, randomPositionY, INIT_VEL, INIT_VEL);
                 particles.add(p);
                 fw.write(p.getId() + " " + radius + " " + randomPositionX + " " + randomPositionY + " " + INIT_VEL + " " + INIT_VEL + "\n");
@@ -247,8 +236,6 @@ public class Configuration {
 	private static void writeOvitoParticle(FileWriter fw, Particle particle) throws IOException {
 		fw.write(particle.getId() + " " + particle.getRadius() + " " + particle.getPosition().x + " "
 				+ particle.getPosition().y + " " + particle.getVelocity().x + " " + particle.getVelocity().y + " " + particle.getPressure());
-		//double angle = particle.getVelocityAngle();
-		//fw.write(((Math.cos(angle) + 1) / 2) + " " + ((Math.sin(angle) + 1) / 2) + " " + Math.tan((angle + Math.PI) / 8));
 		fw.write('\n');
 	}
 
