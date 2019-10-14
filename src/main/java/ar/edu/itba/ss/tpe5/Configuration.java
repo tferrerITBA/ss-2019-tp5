@@ -20,7 +20,7 @@ public class Configuration {
 	private static String EXIT_FILE_NAME = "exit.txt";
 	public static final double BOX_WIDTH = 0.4; // m
 	public static final double BOX_HEIGHT = 1.5; // m
-	public static final double HOLE_WIDTH = 0.25; // m
+	public static double HOLE_WIDTH = 0.25; // m
 	public static final double MIN_PARTICLE_HEIGHT = BOX_HEIGHT / 10; // m
 	public static final double MIN_PARTICLE_RADIUS = 0.01; // m
 	private static final double MAX_PARTICLE_RADIUS = 0.015; // m
@@ -57,6 +57,12 @@ public class Configuration {
 	    while(fileName == "") {
 	    	fileName = scanner.nextLine();
 			}
+			System.out.println("Enter Hole width:");
+			double width = 0;
+	    while(width <=0 ) {
+	    	width = stringToDouble(scanner.nextLine());
+			}
+			HOLE_WIDTH = width;
 			INPUT_FILE_NAME = fileName + "-input.txt";
 			OUTPUT_FILE_NAME = fileName + ".xyz";
 			EXIT_FILE_NAME = fileName + ".txt";

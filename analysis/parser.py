@@ -1,4 +1,4 @@
-from models import Particle, Step, Simulation
+from models import Particle, Step, Simulation, Times
 import glob
 import sys
 import os
@@ -11,7 +11,7 @@ def parseModeFromArgs():
 
 def parseTimesFile(filename):
   times = [float(line.rstrip('\n')) for line in open(filename)]
-  return times
+  return Times(times, filename)
 
 def parseFile(filename):
   lines = [line.rstrip('\n') for line in open(filename)]
@@ -21,8 +21,9 @@ def parseFile(filename):
   return Simulation(steps, os.path.basename(filename))
 
 def parseDirectory(directory, parse=parseFile):
-  return [parse(f) for f in glob.glob(directory + '/*')]
-
+  dirs = glob.glob(directory + '/*')
+  dirs.sort()
+  return [parse(f) for f in dirs]
 
 def parseStep(lines):
   nextLines = int(lines.pop(0))

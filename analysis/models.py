@@ -1,5 +1,6 @@
 import numpy
 import math
+import calculator
 
 class Particle:
   def __init__(self, id, radius, x, y, vx, vy, pressure):
@@ -36,5 +37,24 @@ class Simulation:
     self.name = name
   def getSecondHalf(self):
     return self.steps[len(self.steps)//2:]
+  def getLastThird(self):
+    return self.steps[-len(self.steps)//3:]
+
+class Times:
+  def __init__(self, steps, name):
+    self.steps = steps
+    self.name = name.split('/')[-1].split('.txt')[0]
+    self.hole = float(self.name)
+    self.Q = None
+  def setQ(self, Q):
+    self.Q = Q
+  def getAverage(self):
+    return numpy.nanmean(self.getSecondHalfQ(), axis=0)
+  def getError(self):
+    return numpy.nanstd(self.getSecondHalfQ(), axis=0)
+  def getSecondHalf(self):
+    return self.steps[len(self.steps)//2:]
+  def getSecondHalfQ(self):
+    return self.Q[len(self.Q)//2:]
   def getLastThird(self):
     return self.steps[-len(self.steps)//3:]

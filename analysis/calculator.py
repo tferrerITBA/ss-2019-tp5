@@ -54,21 +54,22 @@ def mb_pdf(x,c):
 
 def beverloo(x,c):
   gravity = 9.8
-  hole_size = 1.5
+  hole_size = x
   mean_radius = 0.025 # average of particles radius
-  n = 886 / (1 * 0.1) # particles per unit of area
+  n = 520 / (1.5 * 0.4) # particles per unit of area
   return n * math.sqrt(gravity) * ((hole_size - c * mean_radius) ** 1.5)
 
 def errorCalculator(xs, ys, approxFn, c):
   results = []
   for i in range(len(ys)):
-    results.append((ys[i] - approxFn(xs[i], c)) ** 2)
+    results.append((ys[i].getAverage() - approxFn(xs[i], c)) ** 2)
   return sum(results)
 
 def errorFn(xs, ys, approxFn = beverloo):
   results = []
-  rang = discreteRange(10,12, 0.0001)
+  rang = discreteRange(0,4, 0.001)
   for c in rang:
     results.append(errorCalculator(xs, ys, approxFn, c))
-  print(f'min: {rang[results.index(min(results))]}\n')
+  minimum = rang[results.index(min(results))]
+  print(f'min: {minimum}\n')
   return results, rang

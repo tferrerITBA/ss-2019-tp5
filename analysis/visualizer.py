@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion, calculateKineticEnergy, calculateExitsValues
 from parser import parseDirectoryFromArgs, parseModeFromArgs, parseTimesFile, parseDirectory
-from calculator import errorFn, discreteRange, PDF, mb, averageLists, stdevLists
+from calculator import errorFn, discreteRange, PDF, mb, averageLists, stdevLists, beverloo
 import os
 import pickle
 
@@ -149,39 +149,57 @@ def ex2_4(simulations):
     saveFig(fig, '2_4_error')
 
 def tp5_e1a():
+  # Calculo del caudal
   timesList = parseDirectory('analysis/exits', parseTimesFile)
-  totalTime = 5 # seconds
-  windowSize = 1 # 1s
-  offset = 0.1 # 100ms
+  windowSize = 30 # particles
 
-  exitsList = []
-  for times in timesList:
-    print(f'Amount of particles gone: {len(times)}')
-    print(f'Last time: {times[-1]}')
+  for time in timesList:
+    times = time.steps
+    Q = []
+    for i in range(len(times) - windowSize):
+      q = windowSize / (times[i+windowSize] - times[i])
+      Q.append(q)
+    time.setQ(Q)
 
-    exits = []
-    for iteration in range(int(totalTime / windowSize) * int(windowSize / offset) - 10): # TODO: Ese 8 esta hardcodeado para que no se vaya del indice
-      currentIdx = next(idx for idx, time in enumerate(times) if time >= offset * iteration )
-      initialTime = times[currentIdx]
-      accumulated = 0
-      while (times[currentIdx] < initialTime + windowSize):
-        accumulated += 1
-        currentIdx += 1
-      exits.append(accumulated)
-    exitsList.append(exits)
-
-  # average last third of exits
-  avg, err = calculateExitsValues(exitsList)
-  print(f'Caudal promedio: {avg}')
-  print(f'Error: {err}')
-  fig, ax = plt.subplots()
-  ax.set_ylabel('Caudal [p/s]')
+  fig, ax = plt.subplots(figsize=(16,4))
+  ax.set_ylabel('Caudal [particulas/s]')
   ax.set_xlabel('Tiempo [s]')
-  markers, caps, bars = ax.errorbar([x * offset for x in range(len(avg))], avg, yerr=err,capsize=5, capthick=2, fmt='o-', markersize=4)
-  [bar.set_alpha(0.5) for bar in bars]
+  for time in timesList:
+    print(f'Name: {time.name}; Average: {time.getAverage()}; Error: {time.getError()}')
+    ax.plot(time.steps[:-windowSize], time.Q, label=f'D = {time.name}')
+
+  ax.legend()
   fig.tight_layout()
-  plt.show()
-  saveFig(fig, '1_1a')
+  saveFig(fig, '1_1a--caudales')
+
+  # Beverloo curva
+
+  xs = [time.hole for time in timesList]
+  ys = [time for time in timesList]
+  errs = [time.getError() for time in timesList]
+  results, rang = errorFn(xs, ys)
+
+  fig, ax = plt.subplots()
+  ax.set_ylabel('ECM')
+  ax.set_xlabel('Parámetro C')
+  ax.plot(rang, results, 'o-', markersize=2) 
+  # ax.errorbar(float(time.name), time.getAverage(), yerr=time.getError())
+  fig.tight_layout()
+  saveFig(fig, '1_1a--error')
+
+  # Beverloo values
+  fig, ax = plt.subplots()
+  xs = [time.hole for time in timesList]
+  ys = [time.getAverage() for time in timesList]
+  errs = [time.getError() for time in timesList]
+  bvs = [beverloo(x, 1.84) for x in xs]
+  ax.set_ylabel('Caudal promedio [particulas/s]')
+  ax.set_xlabel('Ancho de apertura [m]')
+  markers, caps, bars = ax.errorbar(xs, ys, yerr=errs, fmt='o-', markersize=2, zorder=1,capsize=5, capthick=2)
+  ax.plot(xs, bvs, 'rx', markersize=6, zorder=10) 
+  fig.tight_layout()
+  saveFig(fig, '1_1a--adjusted')
+  # plt.show()
 
 def tp5_e1b(simulations):
     kineticEnergies = [calculateKineticEnergy(simulation) for simulation in simulations]
@@ -207,20 +225,6 @@ def tp5_e1c(simulations):
     fig.tight_layout()
     ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=4)
     saveFig(fig, '1_1b')
-
-def bev():
-  xs = [0.15, 0.17, 0.22, 0.25] # Acá van los valores usados de D 
-  ys = [1, 2, 3, 4] # Acá van los valores de caudales para cada D
-  err = [0.1, 0.1, 0.1, 0.1] #Acá van los errores del caudal para cada D
-  results, rang = errorFn(xs, ys)
-  fig, ax = plt.subplots()
-  ax.set_ylabel('Caudal promedio [p/s]')
-  ax.set_xlabel('Ancho de apertura [m]')
-  fig.tight_layout()
-  ax.plot(xs, ys, 'o-', markersize=4)
-  ax.plot(rang, results, 'o', markersize=2) 
-  saveFig(fig, '1_1bev')
-
 
 
 def run():
