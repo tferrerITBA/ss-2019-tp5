@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from analyzer import calculateCollisionFrequency, calculateCollisionTimesAverage, calculateProbabilityCollisionTimesDistribution, calculateProbabilityVelocities, calculateDiffusion, calculateKineticEnergy, calculateExitsValues
 from parser import parseDirectoryFromArgs, parseModeFromArgs, parseTimesFile, parseDirectory
-from calculator import errorFn, discreteRange, PDF, mb, averageLists
+from calculator import errorFn, discreteRange, PDF, mb, averageLists, stdevLists
 import os
 import pickle
 
@@ -177,7 +177,8 @@ def tp5_e1a():
   fig, ax = plt.subplots()
   ax.set_ylabel('Caudal [p/s]')
   ax.set_xlabel('Tiempo [s]')
-  ax.errorbar([x * offset for x in range(len(avg))], avg, yerr=err, fmt='o-', markersize=4)
+  markers, caps, bars = ax.errorbar([x * offset for x in range(len(avg))], avg, yerr=err,capsize=5, capthick=2, fmt='o-', markersize=4)
+  [bar.set_alpha(0.5) for bar in bars]
   fig.tight_layout()
   plt.show()
   saveFig(fig, '1_1a')
@@ -185,13 +186,14 @@ def tp5_e1a():
 def tp5_e1b(simulations):
     kineticEnergies = [calculateKineticEnergy(simulation) for simulation in simulations]
     kineticEnergy = averageLists(kineticEnergies)
+    kineticErrs = stdevLists(kineticEnergies)
     dt = 0.005 # seconds
     fig, ax = plt.subplots()
     # ax.set_yscale('log')
     ax.set_ylabel('Energía cinética [J]')
     ax.set_xlabel('Tiempo [s]')
     fig.tight_layout()
-    ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=4)
+    ax.plot([x * dt for x in range(len(kineticEnergy))], kineticEnergy, 'o-', markersize=3)
     saveFig(fig, '1_1b')
 
 def tp5_e1c(simulations):
@@ -207,9 +209,9 @@ def tp5_e1c(simulations):
     saveFig(fig, '1_1b')
 
 def bev():
-  xs = [0.15, 0.17, 0.22, 0.25]
-  ys = [1, 2, 3, 4]
-  err = [0.1, 0.1, 0.1, 0.1]
+  xs = [0.15, 0.17, 0.22, 0.25] # Acá van los valores usados de D 
+  ys = [1, 2, 3, 4] # Acá van los valores de caudales para cada D
+  err = [0.1, 0.1, 0.1, 0.1] #Acá van los errores del caudal para cada D
   results, rang = errorFn(xs, ys)
   fig, ax = plt.subplots()
   ax.set_ylabel('Caudal promedio [p/s]')
@@ -222,6 +224,10 @@ def bev():
 
 
 def run():
+  print("python analysis/visualizer.py . 6")
+  print("python analysis/visualizer.py analysis/results 7")
+  print("python analysis/visualizer.py analysis/results 8")
+  print("Las imágenes se guardan en la carpeta output de la raiz del proyecto.")
   print("Parse simulations\n")
   # if os.path.exists('22a.tmp'):
   #   print("File exists!\n")
@@ -229,13 +235,14 @@ def run():
   #   simulations = pickle.load(file)
   #   file.close()
   # else:
-  simulations = parseDirectoryFromArgs()
     # file = open('22a.tmp', 'wb')
     # print("Saving file\n")
     # pickle.dump(simulations, file)
     # file.close()
   print("Parse mode\n")
   mode = parseModeFromArgs()
+  if (mode != 6):
+    simulations = parseDirectoryFromArgs()
   if mode == 1:
     ex3_4(simulations)
   elif mode == 2:
