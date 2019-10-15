@@ -36,7 +36,7 @@ public class GranularManager {
 			grid.updateGridSections();
 		}
 	}
-
+    
     public void verletUpdate(List<Particle> previousParticles, List<Particle> updatedParticles) {
         List<Particle> currentParticles = grid.getParticles();
         List<Particle[]> repositionParticles = new ArrayList<>();
@@ -145,7 +145,7 @@ public class GranularManager {
 		}
 
         resultantForceY += Configuration.K_NORM * horizBorderOverlap;
-        //resultantForceX += Configuration.K_TANG * horizBorderOverlap * p.getVelocity().getX();
+        resultantForceX += - Configuration.K_TANG * horizBorderOverlap * p.getVelocity().getX();
         
         // Check for vertical border overlaps
         double vertBorderOverlap = 0;
@@ -156,8 +156,7 @@ public class GranularManager {
         	vertBorderOverlap = p.getRadius() - Math.abs(p.getPosition().getX() - Configuration.BOX_WIDTH);
         	resultantForceX += - Configuration.K_NORM * vertBorderOverlap;
         }
-				
-        // resultantForceY += Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
+        resultantForceY += - Configuration.K_TANG * vertBorderOverlap * p.getVelocity().getY();
         
 		resultantForceY += p.getMass() * Configuration.GRAVITY;
 		p.calculatePressure(resultantForceN);
