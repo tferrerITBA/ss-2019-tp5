@@ -33,7 +33,6 @@ public class Grid {
 				grid.get(i).add(new GridSection(i, j));
 			}
 		}
-		System.out.println("ROWS: " + gridSectionRows + " COLUMNS: " + m);
 		updateGridSections();
 	}
 	
