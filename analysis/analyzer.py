@@ -46,7 +46,7 @@ def calculateKineticEnergy(simulation):
   getEnergy = lambda particle: (particle.mass * (particle.getVelocityLength() ** 2)) / 2.0
   kineticsList = [ map(getEnergy, particles) for particles in particlesList]
   kineticsSteps = [sum(kinetics) for kinetics in kineticsList]
-  return kineticsSteps
+  return kineticsSteps[-10:]
 
 def calculateExitsValues(qs):
   lastThird = qs[-len(qs)//3:]

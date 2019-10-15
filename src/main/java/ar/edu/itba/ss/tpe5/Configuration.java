@@ -60,8 +60,7 @@ public class Configuration {
 	    while(k <=0 ) {
 	    	k = stringToDouble(scanner.nextLine());
 			}
-			HOLE_WIDTH = 0;
-			K_FACTOR = k;
+			K_FACTOR = 2.0;
 			INPUT_FILE_NAME = fileName + "-input.txt";
 			OUTPUT_FILE_NAME = fileName + ".xyz";
 			EXIT_FILE_NAME = fileName + ".txt";

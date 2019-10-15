@@ -195,14 +195,14 @@ def tp5_e1a():
   bvs = [beverloo(x, 1.84) for x in xs]
   ax.set_ylabel('Caudal promedio [particulas/s]')
   ax.set_xlabel('Ancho de apertura [m]')
-  markers, caps, bars = ax.errorbar(xs, ys, yerr=errs, fmt='o-', markersize=2, zorder=1,capsize=5, capthick=2)
-  ax.plot(xs, bvs, 'rx', markersize=6, zorder=10) 
+  ax.plot(xs, bvs, 'rx-', markersize=6, zorder=1) 
+  markers, caps, bars = ax.errorbar(xs, ys, yerr=errs, fmt='o', markersize=5, zorder=10,capsize=5, capthick=2)
   fig.tight_layout()
   saveFig(fig, '1_1a--adjusted')
   # plt.show()
 
 def tp5_e1b(simulations):
-    dt = 0.005 # seconds
+    dt = 0.05 # seconds
     leftOffset = 0
    
     fig, ax = plt.subplots(figsize=(16,4))
@@ -220,7 +220,7 @@ def tp5_e1b(simulations):
     saveFig(fig, f'1_1b')
 
 def tp5_e1c(simulations):
-    dt = 0.005 # seconds
+    dt = 0.05 # seconds
     leftOffset = 0
    
     fig, ax = plt.subplots(figsize=(16,4))
@@ -231,11 +231,13 @@ def tp5_e1c(simulations):
 
     for simulation in simulations:
       kineticEnergy = calculateKineticEnergy(simulation)
-      xs = [x * dt for x in range(len(kineticEnergy))]
-      ax.plot(xs[leftOffset:], kineticEnergy[leftOffset:], '-', label=f'Kt = {simulation.name} x 10^5', linewidth=1)
-    ax.legend()
+      avg = sum(kineticEnergy) / len(kineticEnergy)
+      print(f'Simulacion: {simulation.name}; Energia: {avg}')
+      # xs = [x * dt for x in range(len(kineticEnergy))]
+      # ax.plot(xs[leftOffset:], kineticEnergy[leftOffset:], '-', label=f'Kt = {simulation.name} x 10^5', linewidth=1)
+    # ax.legend()
 
-    saveFig(fig, f'1_1c')
+    # saveFig(fig, f'1_1c')
 
 
 def run():

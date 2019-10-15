@@ -19,7 +19,7 @@ public class GranularManager {
     public void execute() {
 		List<Particle> previousParticles = initPreviousParticles(grid.getParticles());
 		double accumulatedPrintingTime = 0.0;
-		double printingTimeLimit = 0.005; //s
+		double printingTimeLimit = 0.05; //s
 		
 		while(Double.compare(accumulatedTime, Configuration.getTimeLimit()) <= 0) {
 			grid.calculateAllParticlesNeighbors();
